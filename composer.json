@@ -15,7 +15,7 @@
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.10.1",
         "tightenco/ziggy": "^2.0",
-        "phpspreadsheet/phpspreadsheet": "^2.0"
+        "phpoffice/phpspreadsheet": "^2.0"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
