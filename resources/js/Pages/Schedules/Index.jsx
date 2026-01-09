@@ -36,66 +36,57 @@ export default function Index({ schedules, auth }) {
     const handleTestConnection = () => {
         setCheckingFonnte(true);
         setFonnteStatus(null);
-        router.get(
-            route("fonnte.test"),
-            {},
-            {
-                onSuccess: (page) => {
-                    // Try to parse the response
-                    try {
-                        const props = page.props;
-                        if (props.fonnteTest) {
-                            setFonnteStatus(props.fonnteTest);
-                        }
-                    } catch (e) {
-                        // If JSON, parse directly
-                        setFonnteStatus({
-                            success: true,
-                            message:
-                                "Koneksi berhasil! (cek console untuk detail)",
-                        });
-                    }
-                },
-                onError: (errors) => {
-                    setFonnteStatus({
-                        success: false,
-                        message: errors.message || "Gagal terhubung",
-                    });
-                },
-                onFinish: () => setCheckingFonnte(false),
+        setQuotaStatus(null);
+
+        fetch("/fonnte/test", {
+            method: "GET",
+            headers: {
+                Accept: "application/json",
+                "X-Requested-With": "XMLHttpRequest",
             },
-        );
+            credentials: "same-origin",
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                setFonnteStatus(data);
+            })
+            .catch(() => {
+                setFonnteStatus({
+                    success: false,
+                    message: "Gagal terhubung",
+                });
+            })
+            .finally(() => {
+                setCheckingFonnte(false);
+            });
     };
 
     const handleCheckQuota = () => {
         setCheckingFonnte(true);
+        setFonnteStatus(null);
         setQuotaStatus(null);
-        router.get(
-            route("fonnte.quota"),
-            {},
-            {
-                onSuccess: (page) => {
-                    try {
-                        const props = page.props;
-                        if (props.fonnteQuota) {
-                            setQuotaStatus(props.fonnteQuota);
-                        }
-                    } catch (e) {
-                        setQuotaStatus({
-                            success: true,
-                            message: "Kuota berhasil diambil",
-                        });
-                    }
-                },
-                onError: (errors) => {
-                    setQuotaStatus({
-                        success: false,
-                        message: errors.message || "Gagal mengambil kuota",
-                    });
-                },
-                onFinish: () => setCheckingFonnte(false),
+
+        fetch("/fonnte/quota", {
+            method: "GET",
+            headers: {
+                Accept: "application/json",
+                "X-Requested-With": "XMLHttpRequest",
             },
-        );
+            credentials: "same-origin",
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                setQuotaStatus(data);
+            })
+            .catch(() => {
+                setQuotaStatus({
+                    success: false,
+                    message: "Gagal mengambil kuota",
+                });
+            })
+            .finally(() => {
+                setCheckingFonnte(false);
+            });
     };
 
     const getRoleIcon = (role) => {
