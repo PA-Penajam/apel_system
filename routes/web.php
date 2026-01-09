@@ -2,6 +2,9 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ScheduleController;
+use App\Models\Assignment;
+use App\Models\Schedule;
+use Carbon\Carbon;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -16,7 +19,52 @@ Route::get('/', function () {
 });
 
 Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
+    $today = Carbon::today();
+
+    $stats = [
+        'total_schedules' => Schedule::count(),
+        'schedules_this_month' => Schedule::whereMonth('date', $today->month)
+            ->whereYear('date', $today->year)->count(),
+        'upcoming_schedules' => Schedule::where('date', '>=', $today)
+            ->orderBy('date')->count(),
+        'total_assignments' => Assignment::count(),
+    ];
+
+    $upcomingSchedules = Schedule::with('assignments.user')
+        ->where('date', '>=', $today)
+        ->orderBy('date')
+        ->take(5)
+        ->get()
+        ->map(function ($schedule) {
+            return [
+                'id' => $schedule->id,
+                'date' => $schedule->date,
+                'type' => $schedule->type,
+                'assignments_count' => $schedule->assignments->count(),
+                'day_name' => Carbon::parse($schedule->date)->locale('id')->dayName,
+            ];
+        });
+
+    $recentSchedules = Schedule::with('assignments.user')
+        ->where('date', '<', $today)
+        ->orderBy('date', 'desc')
+        ->take(3)
+        ->get()
+        ->map(function ($schedule) {
+            return [
+                'id' => $schedule->id,
+                'date' => $schedule->date,
+                'type' => $schedule->type,
+                'assignments_count' => $schedule->assignments->count(),
+                'day_name' => Carbon::parse($schedule->date)->locale('id')->dayName,
+            ];
+        });
+
+    return Inertia::render('Dashboard', [
+        'stats' => $stats,
+        'upcomingSchedules' => $upcomingSchedules,
+        'recentSchedules' => $recentSchedules,
+    ]);
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
@@ -41,4 +89,4 @@ Route::middleware('auth')->group(function () {
     Route::get('/fonnte/quota', [ScheduleController::class, 'checkQuota'])->name('fonnte.quota');
 });
 
-require __DIR__ . '/auth.php';
+require __DIR__.'/auth.php';

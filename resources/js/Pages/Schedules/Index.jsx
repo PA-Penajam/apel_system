@@ -9,6 +9,9 @@ export default function Index({ schedules, auth }) {
     });
 
     const [broadcastingId, setBroadcastingId] = useState(null);
+    const [fonnteStatus, setFonnteStatus] = useState(null);
+    const [quotaStatus, setQuotaStatus] = useState(null);
+    const [checkingFonnte, setCheckingFonnte] = useState(false);
 
     const handleGenerate = (e) => {
         e.preventDefault();
@@ -28,6 +31,71 @@ export default function Index({ schedules, auth }) {
                 },
             );
         }
+    };
+
+    const handleTestConnection = () => {
+        setCheckingFonnte(true);
+        setFonnteStatus(null);
+        router.get(
+            route("fonnte.test"),
+            {},
+            {
+                onSuccess: (page) => {
+                    // Try to parse the response
+                    try {
+                        const props = page.props;
+                        if (props.fonnteTest) {
+                            setFonnteStatus(props.fonnteTest);
+                        }
+                    } catch (e) {
+                        // If JSON, parse directly
+                        setFonnteStatus({
+                            success: true,
+                            message:
+                                "Koneksi berhasil! (cek console untuk detail)",
+                        });
+                    }
+                },
+                onError: (errors) => {
+                    setFonnteStatus({
+                        success: false,
+                        message: errors.message || "Gagal terhubung",
+                    });
+                },
+                onFinish: () => setCheckingFonnte(false),
+            },
+        );
+    };
+
+    const handleCheckQuota = () => {
+        setCheckingFonnte(true);
+        setQuotaStatus(null);
+        router.get(
+            route("fonnte.quota"),
+            {},
+            {
+                onSuccess: (page) => {
+                    try {
+                        const props = page.props;
+                        if (props.fonnteQuota) {
+                            setQuotaStatus(props.fonnteQuota);
+                        }
+                    } catch (e) {
+                        setQuotaStatus({
+                            success: true,
+                            message: "Kuota berhasil diambil",
+                        });
+                    }
+                },
+                onError: (errors) => {
+                    setQuotaStatus({
+                        success: false,
+                        message: errors.message || "Gagal mengambil kuota",
+                    });
+                },
+                onFinish: () => setCheckingFonnte(false),
+            },
+        );
     };
 
     const getRoleIcon = (role) => {
@@ -384,6 +452,145 @@ export default function Index({ schedules, auth }) {
                                 <span>Pembaca Lainnya</span>
                             </div>
                         </div>
+                    </div>
+
+                    {/* Fonnte Status Section */}
+                    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                        <h4 className="font-semibold text-gray-700 mb-4 flex items-center gap-2">
+                            <span>📱</span>
+                            Status Fonnte WhatsApp
+                        </h4>
+
+                        <div className="flex flex-wrap gap-4 mb-4">
+                            <button
+                                onClick={handleTestConnection}
+                                disabled={checkingFonnte}
+                                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 flex items-center gap-2"
+                            >
+                                {checkingFonnte ? (
+                                    <svg
+                                        className="animate-spin h-4 w-4"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <circle
+                                            className="opacity-25"
+                                            cx="12"
+                                            cy="12"
+                                            r="10"
+                                            stroke="currentColor"
+                                            strokeWidth="4"
+                                            fill="none"
+                                        />
+                                        <path
+                                            className="opacity-75"
+                                            fill="currentColor"
+                                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                                        />
+                                    </svg>
+                                ) : (
+                                    <span>🔗</span>
+                                )}
+                                Test Koneksi
+                            </button>
+
+                            <button
+                                onClick={handleCheckQuota}
+                                disabled={checkingFonnte}
+                                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 flex items-center gap-2"
+                            >
+                                {checkingFonnte ? (
+                                    <svg
+                                        className="animate-spin h-4 w-4"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <circle
+                                            className="opacity-25"
+                                            cx="12"
+                                            cy="12"
+                                            r="10"
+                                            stroke="currentColor"
+                                            strokeWidth="4"
+                                            fill="none"
+                                        />
+                                        <path
+                                            className="opacity-75"
+                                            fill="currentColor"
+                                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                                        />
+                                    </svg>
+                                ) : (
+                                    <span>📊</span>
+                                )}
+                                Cek Kuota
+                            </button>
+                        </div>
+
+                        {/* Test Connection Result */}
+                        {fonnteStatus && (
+                            <div
+                                className={`p-4 rounded-lg mb-4 ${fonnteStatus.success ? "bg-green-50 border border-green-200" : "bg-red-50 border border-red-200"}`}
+                            >
+                                <div className="flex items-start gap-2">
+                                    <span className="text-xl">
+                                        {fonnteStatus.success ? "✅" : "❌"}
+                                    </span>
+                                    <div>
+                                        <p
+                                            className={`font-medium ${fonnteStatus.success ? "text-green-800" : "text-red-800"}`}
+                                        >
+                                            {fonnteStatus.message}
+                                        </p>
+                                        {fonnteStatus.device && (
+                                            <p className="text-sm text-green-700 mt-1">
+                                                Device:{" "}
+                                                {fonnteStatus.device.phone ||
+                                                    "Unknown"}
+                                            </p>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Quota Result */}
+                        {quotaStatus && (
+                            <div
+                                className={`p-4 rounded-lg ${quotaStatus.success ? "bg-blue-50 border border-blue-200" : "bg-red-50 border border-red-200"}`}
+                            >
+                                <div className="flex items-start gap-2">
+                                    <span className="text-xl">
+                                        {quotaStatus.success ? "📊" : "❌"}
+                                    </span>
+                                    <div>
+                                        <p
+                                            className={`font-medium ${quotaStatus.success ? "text-blue-800" : "text-red-800"}`}
+                                        >
+                                            {quotaStatus.message}
+                                        </p>
+                                        {quotaStatus.quota && (
+                                            <div className="mt-2 text-sm text-blue-700">
+                                                <p>
+                                                    Sisa Kuota:{" "}
+                                                    {
+                                                        quotaStatus.quota
+                                                            .remaining
+                                                    }
+                                                </p>
+                                                <p>
+                                                    Total Kuota:{" "}
+                                                    {quotaStatus.quota.total}
+                                                </p>
+                                                <p>
+                                                    Expired:{" "}
+                                                    {quotaStatus.quota
+                                                        .expired || "-"}
+                                                </p>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
