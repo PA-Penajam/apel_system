@@ -14,8 +14,7 @@ return new class extends Migration
         Schema::create('assignments', function (Blueprint $table) {
             $table->id();
             $table->foreignId('schedule_id')->constrained('schedules')->onDelete('cascade');
-            $table->unsignedBigInteger('user_id');
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->unsignedInteger('user_id'); // Menggunakan unsignedInteger karena users.id dari Breeze adalah INT
             $table->string('role'); // pembina, pimpinan, mc, doa, 8nilai, undang-undang
             $table->timestamps();
         });
