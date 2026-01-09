@@ -15,8 +15,10 @@ use Illuminate\Support\Facades\Log;
 class FonnteService
 {
     protected string $token;
+
     protected string $targetGroup;
-    protected string $baseUrl = 'https://api.fonnte.com/api';
+
+    protected string $baseUrl = 'https://api.fonnte.com';
 
     public function __construct()
     {
@@ -31,6 +33,7 @@ class FonnteService
     {
         if (empty($this->token)) {
             Log::warning('Fonnte Token tidak dikonfigurasi');
+
             return false;
         }
 
@@ -48,13 +51,16 @@ class FonnteService
 
             if ($response->successful() && isset($result['status']) && $result['status'] === true) {
                 Log::info('Fonnte: Pesan individual terkirim', ['phone' => $formattedPhone]);
+
                 return true;
             }
 
             Log::warning('Fonnte: Gagal mengirim ke individual', ['response' => $result]);
+
             return false;
         } catch (\Exception $e) {
-            Log::error('Fonnte Exception: ' . $e->getMessage());
+            Log::error('Fonnte Exception: '.$e->getMessage());
+
             return false;
         }
     }
@@ -66,6 +72,7 @@ class FonnteService
     {
         if (empty($this->token)) {
             Log::warning('Fonnte Token tidak dikonfigurasi');
+
             return false;
         }
 
@@ -81,13 +88,16 @@ class FonnteService
 
             if ($response->successful() && isset($result['status']) && $result['status'] === true) {
                 Log::info('Fonnte: Pesan grup terkirim', ['group_id' => $groupId]);
+
                 return true;
             }
 
             Log::warning('Fonnte: Gagal mengirim ke grup', ['response' => $result]);
+
             return false;
         } catch (\Exception $e) {
-            Log::error('Fonnte Group Exception: ' . $e->getMessage());
+            Log::error('Fonnte Group Exception: '.$e->getMessage());
+
             return false;
         }
     }
@@ -99,6 +109,7 @@ class FonnteService
     {
         if (empty($this->token)) {
             Log::warning('Fonnte Token tidak dikonfigurasi');
+
             return false;
         }
 
@@ -115,13 +126,16 @@ class FonnteService
 
             if ($response->successful() && isset($result['status']) && $result['status'] === true) {
                 Log::info('Fonnte: Pesan terkirim ke semua grup');
+
                 return true;
             }
 
             Log::warning('Fonnte: Gagal mengirim ke semua grup', ['response' => $result]);
+
             return false;
         } catch (\Exception $e) {
-            Log::error('Fonnte All Groups Exception: ' . $e->getMessage());
+            Log::error('Fonnte All Groups Exception: '.$e->getMessage());
+
             return false;
         }
     }
@@ -133,6 +147,7 @@ class FonnteService
     {
         if (empty($this->token)) {
             Log::warning('Fonnte Token tidak dikonfigurasi');
+
             return false;
         }
 
@@ -154,7 +169,8 @@ class FonnteService
 
             return false;
         } catch (\Exception $e) {
-            Log::error('Fonnte Send Exception: ' . $e->getMessage());
+            Log::error('Fonnte Send Exception: '.$e->getMessage());
+
             return false;
         }
     }
@@ -167,7 +183,7 @@ class FonnteService
         $phone = preg_replace('/[^0-9]/', '', $phone);
 
         if (str_starts_with($phone, '0')) {
-            return '62' . substr($phone, 1);
+            return '62'.substr($phone, 1);
         }
 
         if (str_starts_with($phone, '62')) {
@@ -175,7 +191,7 @@ class FonnteService
         }
 
         if (str_starts_with($phone, '8')) {
-            return '62' . $phone;
+            return '62'.$phone;
         }
 
         return $phone;
@@ -196,25 +212,30 @@ class FonnteService
         try {
             $response = Http::withHeaders([
                 'Authorization' => $this->token,
-            ])->get("{$this->baseUrl}/check");
+            ])->post("{$this->baseUrl}/device", []);
 
             if ($response->successful()) {
                 $data = $response->json();
+
                 return [
-                    'success' => true,
-                    'message' => 'Koneksi berhasil',
-                    'device' => $data ?? null,
+                    'success' => $data['status'] ?? false,
+                    'message' => ($data['status'] ?? false) ? 'Koneksi berhasil' : 'Koneksi gagal',
+                    'device' => [
+                        'phone' => $data['device'] ?? null,
+                        'name' => $data['name'] ?? null,
+                        'status' => $data['device_status'] ?? null,
+                    ],
                 ];
             }
 
             return [
                 'success' => false,
-                'message' => 'Koneksi gagal',
+                'message' => 'Koneksi gagal: '.$response->body(),
             ];
         } catch (\Exception $e) {
             return [
                 'success' => false,
-                'message' => 'Error: ' . $e->getMessage(),
+                'message' => 'Error: '.$e->getMessage(),
             ];
         }
     }
@@ -234,16 +255,19 @@ class FonnteService
         try {
             $response = Http::withHeaders([
                 'Authorization' => $this->token,
-            ])->get("{$this->baseUrl}/quota");
+            ])->post("{$this->baseUrl}/device", []);
 
             if ($response->successful()) {
                 $data = $response->json();
+
                 return [
                     'success' => true,
                     'quota' => [
-                        'remaining' => $data['remaining'] ?? 'Unknown',
-                        'total' => $data['total'] ?? 'Unknown',
+                        'remaining' => $data['quota'] ?? 'Unknown',
+                        'total' => $data['quota'] ?? 'Unknown',
                         'expired' => $data['expired'] ?? 'Unknown',
+                        'package' => $data['package'] ?? 'Unknown',
+                        'messages_used' => $data['messages'] ?? 0,
                     ],
                 ];
             }
@@ -288,7 +312,7 @@ class FonnteService
      */
     public function isConfigured(): bool
     {
-        return !empty($this->token);
+        return ! empty($this->token);
     }
 
     /**
@@ -296,6 +320,6 @@ class FonnteService
      */
     public function hasTargetGroup(): bool
     {
-        return !empty($this->targetGroup);
+        return ! empty($this->targetGroup);
     }
 }
