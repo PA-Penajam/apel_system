@@ -2,9 +2,9 @@
 
 namespace App\Services;
 
-use App\Models\User;
-use App\Models\Schedule;
 use App\Models\Assignment;
+use App\Models\Schedule;
+use App\Models\User;
 use Carbon\Carbon;
 
 class SchedulerService
@@ -34,9 +34,19 @@ class SchedulerService
             return;
         }
 
+        // Calculate scheduled notification time
+        // Senin: 07:00 WITA (1 jam sebelum apel jam 08:00)
+        // Jumat: 08:00 WITA (8 jam sebelum apel jam 16:00)
+        $notificationTime = $type === 'senin'
+            ? $date->copy()->setTime(7, 0, 0)  // Senin jam 07:00
+            : $date->copy()->setTime(8, 0, 0); // Jumat jam 08:00
+
         $schedule = Schedule::create([
             'date' => $date->format('Y-m-d'),
             'type' => $type,
+            'scheduled_notification_at' => $notificationTime,
+            'notification_status' => 'pending',
+            'is_auto_notification' => true,
         ]);
 
         $this->assignRoles($schedule);
@@ -52,7 +62,9 @@ class SchedulerService
             $query->where('jenis_jabatan', 'pimpinan');
         });
         $this->assign($schedule, $pembina, 'Pembina Apel');
-        if ($pembina) $assignedIds[] = $pembina->id;
+        if ($pembina) {
+            $assignedIds[] = $pembina->id;
+        }
 
         // 2. Pembaca Doa: Laki-laki PNS + CPAPES
         $doa = $this->selectCandidateForRole('Pembaca Doa', function ($query) use (&$assignedIds) {
@@ -61,7 +73,9 @@ class SchedulerService
                 ->whereNotIn('id', $assignedIds);
         });
         $this->assign($schedule, $doa, 'Pembaca Doa');
-        if ($doa) $assignedIds[] = $doa->id;
+        if ($doa) {
+            $assignedIds[] = $doa->id;
+        }
 
         // 3. Pembaca 8 Nilai MA: Perempuan PNS Staff
         $nilai8 = $this->selectCandidateForRole('Pembaca 8 Nilai MA', function ($query) use (&$assignedIds) {
@@ -71,7 +85,9 @@ class SchedulerService
                 ->whereNotIn('id', $assignedIds);
         });
         $this->assign($schedule, $nilai8, 'Pembaca 8 Nilai MA');
-        if ($nilai8) $assignedIds[] = $nilai8->id;
+        if ($nilai8) {
+            $assignedIds[] = $nilai8->id;
+        }
 
         // 4. MC: Perempuan CPAPES/PPPK Staff
         $mc = $this->selectCandidateForRole('MC', function ($query) use (&$assignedIds) {
@@ -81,7 +97,9 @@ class SchedulerService
                 ->whereNotIn('id', $assignedIds);
         });
         $this->assign($schedule, $mc, 'MC');
-        if ($mc) $assignedIds[] = $mc->id;
+        if ($mc) {
+            $assignedIds[] = $mc->id;
+        }
 
         // 5. Pemimpin Apel: Laki-laki PPPK
         $pemimpin = $this->selectCandidateForRole('Pemimpin Apel', function ($query) use (&$assignedIds) {
@@ -90,7 +108,9 @@ class SchedulerService
                 ->whereNotIn('id', $assignedIds);
         });
         $this->assign($schedule, $pemimpin, 'Pemimpin Apel');
-        if ($pemimpin) $assignedIds[] = $pemimpin->id;
+        if ($pemimpin) {
+            $assignedIds[] = $pemimpin->id;
+        }
 
         // 6. Pembaca Lainnya: CPAPES Staff (yang belum bertugas)
         $lain = $this->selectCandidateForRole('Pembaca Lainnya', function ($query) use (&$assignedIds) {
@@ -99,7 +119,9 @@ class SchedulerService
                 ->whereNotIn('id', $assignedIds);
         });
         $this->assign($schedule, $lain, 'Pembaca Lainnya');
-        if ($lain) $assignedIds[] = $lain->id;
+        if ($lain) {
+            $assignedIds[] = $lain->id;
+        }
     }
 
     /**

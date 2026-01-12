@@ -60,10 +60,36 @@ Route::get('/dashboard', function () {
             ];
         });
 
+    // Failed notifications untuk monitoring
+    $failedNotifications = Schedule::with('assignments.user')
+        ->where('notification_status', 'failed')
+        ->orderBy('date', 'desc')
+        ->take(5)
+        ->get()
+        ->map(function ($schedule) {
+            return [
+                'id' => $schedule->id,
+                'date' => $schedule->date,
+                'type' => $schedule->type,
+                'day_name' => Carbon::parse($schedule->date)->locale('id')->dayName,
+                'assignments' => $schedule->assignments->map(function ($a) {
+                    return [
+                        'id' => $a->id,
+                        'role' => $a->role,
+                        'user' => $a->user ? ['name' => $a->user->name] : null,
+                    ];
+                }),
+            ];
+        });
+
+    $failedCount = Schedule::where('notification_status', 'failed')->count();
+
     return Inertia::render('Dashboard', [
         'stats' => $stats,
         'upcomingSchedules' => $upcomingSchedules,
         'recentSchedules' => $recentSchedules,
+        'failedNotifications' => $failedNotifications,
+        'failedCount' => $failedCount,
     ]);
 })->middleware(['auth', 'verified'])->name('dashboard');
 
@@ -78,6 +104,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/schedules/generate', [ScheduleController::class, 'generate'])->name('schedules.generate');
     Route::delete('/schedules/{schedule}', [ScheduleController::class, 'destroy'])->name('schedules.destroy');
     Route::get('/schedules/{schedule}', [ScheduleController::class, 'show'])->name('schedules.show');
+    Route::post('/schedules/force-send', [ScheduleController::class, 'forceSendManual'])->name('schedules.force-send');
+    Route::put('/schedules/{schedule}/petugas', [ScheduleController::class, 'updatePetugas'])->name('schedules.petugas.update');
 
     // Fonnte broadcast routes
     Route::post('/schedules/broadcast', [ScheduleController::class, 'broadcast'])->name('schedules.broadcast');

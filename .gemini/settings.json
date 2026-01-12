@@ -3,7 +3,7 @@
         "laravel-boost": {
             "command": "php",
             "args": [
-                "artisan",
+                "/Volumes/Home/moohard/Kerjaan-Kepegawaian/apel-app/artisan",
                 "boost:mcp"
             ]
         }

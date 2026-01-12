@@ -1,8 +1,9 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, useForm, router } from "@inertiajs/react";
 import { useState } from "react";
+import ScheduleEditModal from "@/Components/ScheduleEditModal";
 
-export default function Index({ schedules, auth }) {
+export default function Index({ schedules, auth, users }) {
     const { data, setData, post, processing, errors } = useForm({
         start_date: "",
         end_date: "",
@@ -12,6 +13,8 @@ export default function Index({ schedules, auth }) {
     const [fonnteStatus, setFonnteStatus] = useState(null);
     const [quotaStatus, setQuotaStatus] = useState(null);
     const [checkingFonnte, setCheckingFonnte] = useState(false);
+    const [editingSchedule, setEditingSchedule] = useState(null);
+    const [showEditModal, setShowEditModal] = useState(false);
 
     const handleGenerate = (e) => {
         e.preventDefault();
@@ -31,6 +34,26 @@ export default function Index({ schedules, auth }) {
                 },
             );
         }
+    };
+
+    const handleManualSend = (scheduleId) => {
+        if (confirm("Kirim notifikasi manual ke petugas?")) {
+            setBroadcastingId(scheduleId);
+            router.post(
+                route("schedules.broadcast.all"),
+                {
+                    schedule_id: scheduleId,
+                },
+                {
+                    onFinish: () => setBroadcastingId(null),
+                },
+            );
+        }
+    };
+
+    const handleOpenEditModal = (schedule) => {
+        setEditingSchedule(schedule);
+        setShowEditModal(true);
     };
 
     const handleTestConnection = () => {
@@ -111,6 +134,28 @@ export default function Index({ schedules, auth }) {
             "Pembaca Lainnya": "bg-gray-100 border-gray-200 text-gray-800",
         };
         return colors[role] || "bg-gray-100 border-gray-200 text-gray-800";
+    };
+
+    const getStatusBadge = (status) => {
+        const badges = {
+            pending: "bg-yellow-100 text-yellow-800 border-yellow-200",
+            sent: "bg-green-100 text-green-800 border-green-200",
+            skipped: "bg-gray-100 text-gray-800 border-gray-200",
+            failed: "bg-red-100 text-red-800 border-red-200",
+        };
+        const labels = {
+            pending: "Pending",
+            sent: "Terkirim",
+            skipped: "Dilewati",
+            failed: "Gagal",
+        };
+        return (
+            <span
+                className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${badges[status] || badges.pending}`}
+            >
+                {labels[status] || status}
+            </span>
+        );
     };
 
     return (
@@ -259,96 +304,173 @@ export default function Index({ schedules, auth }) {
                                         >
                                             {/* Header */}
                                             <div
-                                                className={`p-4 flex justify-between items-start ${
+                                                className={`p-4 flex flex-col gap-3 ${
                                                     schedule.type === "senin"
                                                         ? "bg-blue-50 border-b border-blue-100"
                                                         : "bg-green-50 border-b border-green-100"
                                                 }`}
                                             >
-                                                <div className="flex items-center gap-3">
-                                                    <span
-                                                        className={`text-2xl ${
-                                                            schedule.type ===
-                                                            "senin"
-                                                                ? "bg-blue-200"
-                                                                : "bg-green-200"
-                                                        } w-10 h-10 rounded-full flex items-center justify-center`}
-                                                    >
-                                                        {schedule.type ===
-                                                        "senin"
-                                                            ? "1️⃣"
-                                                            : "6️⃣"}
-                                                    </span>
-                                                    <div>
+                                                <div className="flex justify-between items-start">
+                                                    <div className="flex items-center gap-3">
                                                         <span
-                                                            className={`text-xs font-bold uppercase tracking-wider px-2 py-1 rounded-full ${
+                                                            className={`text-2xl ${
                                                                 schedule.type ===
                                                                 "senin"
-                                                                    ? "bg-blue-200 text-blue-800"
-                                                                    : "bg-green-200 text-green-800"
-                                                            }`}
+                                                                    ? "bg-blue-200"
+                                                                    : "bg-green-200"
+                                                            } w-10 h-10 rounded-full flex items-center justify-center`}
                                                         >
-                                                            {schedule.type}
+                                                            {schedule.type ===
+                                                            "senin"
+                                                                ? "1️⃣"
+                                                                : "6️⃣"}
                                                         </span>
-                                                        <p className="font-bold text-gray-800 mt-1">
-                                                            {new Date(
-                                                                schedule.date,
-                                                            ).toLocaleDateString(
-                                                                "id-ID",
-                                                                {
-                                                                    day: "numeric",
-                                                                    month: "long",
-                                                                    year: "numeric",
-                                                                },
-                                                            )}
-                                                        </p>
+                                                        <div>
+                                                            <span
+                                                                className={`text-xs font-bold uppercase tracking-wider px-2 py-1 rounded-full ${
+                                                                    schedule.type ===
+                                                                    "senin"
+                                                                        ? "bg-blue-200 text-blue-800"
+                                                                        : "bg-green-200 text-green-800"
+                                                                }`}
+                                                            >
+                                                                {schedule.type}
+                                                            </span>
+                                                            <p className="font-bold text-gray-800 mt-1">
+                                                                {new Date(
+                                                                    schedule.date,
+                                                                ).toLocaleDateString(
+                                                                    "id-ID",
+                                                                    {
+                                                                        day: "numeric",
+                                                                        month: "long",
+                                                                        year: "numeric",
+                                                                    },
+                                                                )}
+                                                            </p>
+                                                        </div>
                                                     </div>
+
+                                                    {/* Status Badge */}
+                                                    {getStatusBadge(
+                                                        schedule.notification_status,
+                                                    )}
                                                 </div>
 
-                                                {/* Broadcast Button */}
-                                                <button
-                                                    onClick={() =>
-                                                        handleBroadcast(
-                                                            schedule.id,
-                                                        )
-                                                    }
-                                                    disabled={
-                                                        broadcastingId ===
-                                                        schedule.id
-                                                    }
-                                                    className={`w-10 h-10 flex items-center justify-center rounded-full transition-all ${
-                                                        broadcastingId ===
-                                                        schedule.id
-                                                            ? "bg-green-500 text-white"
-                                                            : "bg-white text-gray-400 hover:text-green-600 hover:bg-green-50"
-                                                    } shadow-sm`}
-                                                    title="Broadcast ke Grup WhatsApp"
-                                                >
-                                                    {broadcastingId ===
-                                                    schedule.id ? (
-                                                        <svg
-                                                            className="animate-spin h-5 w-5"
-                                                            viewBox="0 0 24 24"
-                                                        >
-                                                            <circle
-                                                                className="opacity-25"
-                                                                cx="12"
-                                                                cy="12"
-                                                                r="10"
-                                                                stroke="currentColor"
-                                                                strokeWidth="4"
+                                                {/* Action Buttons */}
+                                                <div className="flex gap-2">
+                                                    {/* Broadcast Button */}
+                                                    <button
+                                                        onClick={() =>
+                                                            handleBroadcast(
+                                                                schedule.id,
+                                                            )
+                                                        }
+                                                        disabled={
+                                                            broadcastingId ===
+                                                            schedule.id
+                                                        }
+                                                        className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all flex items-center justify-center gap-2 ${
+                                                            broadcastingId ===
+                                                            schedule.id
+                                                                ? "bg-green-500 text-white"
+                                                                : "bg-white text-gray-600 hover:text-green-600 hover:bg-green-50 border border-gray-200"
+                                                        }`}
+                                                        title="Broadcast ke Grup WhatsApp"
+                                                    >
+                                                        {broadcastingId ===
+                                                        schedule.id ? (
+                                                            <svg
+                                                                className="animate-spin h-4 w-4"
+                                                                viewBox="0 0 24 24"
+                                                            >
+                                                                <circle
+                                                                    className="opacity-25"
+                                                                    cx="12"
+                                                                    cy="12"
+                                                                    r="10"
+                                                                    stroke="currentColor"
+                                                                    strokeWidth="4"
+                                                                    fill="none"
+                                                                />
+                                                                <path
+                                                                    className="opacity-75"
+                                                                    fill="currentColor"
+                                                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                                                                />
+                                                            </svg>
+                                                        ) : (
+                                                            <svg
+                                                                xmlns="http://www.w3.org/2000/svg"
+                                                                className="h-4 w-4"
                                                                 fill="none"
-                                                            />
-                                                            <path
-                                                                className="opacity-75"
-                                                                fill="currentColor"
-                                                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-                                                            />
-                                                        </svg>
-                                                    ) : (
+                                                                viewBox="0 0 24 24"
+                                                                stroke="currentColor"
+                                                            >
+                                                                <path
+                                                                    strokeLinecap="round"
+                                                                    strokeLinejoin="round"
+                                                                    strokeWidth={
+                                                                        2
+                                                                    }
+                                                                    d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"
+                                                                />
+                                                            </svg>
+                                                        )}
+                                                        Kirim Grup
+                                                    </button>
+
+                                                    {/* Kirim Manual Button */}
+                                                    {(schedule.notification_status ===
+                                                        "pending" ||
+                                                        schedule.notification_status ===
+                                                            "sent") && (
+                                                        <button
+                                                            onClick={() =>
+                                                                handleManualSend(
+                                                                    schedule.id,
+                                                                )
+                                                            }
+                                                            disabled={
+                                                                broadcastingId ===
+                                                                schedule.id
+                                                            }
+                                                            className="flex-1 py-2 px-3 rounded-lg text-sm font-medium bg-white text-indigo-600 hover:bg-indigo-50 border border-gray-200 transition-all flex items-center justify-center gap-2"
+                                                            title="Kirim notifikasi individual ke petugas"
+                                                        >
+                                                            <svg
+                                                                xmlns="http://www.w3.org/2000/svg"
+                                                                className="h-4 w-4"
+                                                                fill="none"
+                                                                viewBox="0 0 24 24"
+                                                                stroke="currentColor"
+                                                            >
+                                                                <path
+                                                                    strokeLinecap="round"
+                                                                    strokeLinejoin="round"
+                                                                    strokeWidth={
+                                                                        2
+                                                                    }
+                                                                    d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"
+                                                                />
+                                                            </svg>
+                                                            Kirim Manual
+                                                        </button>
+                                                    )}
+
+                                                    {/* Edit Petugas Button */}
+                                                    <button
+                                                        onClick={() =>
+                                                            handleOpenEditModal(
+                                                                schedule,
+                                                            )
+                                                        }
+                                                        className="p-2 rounded-lg text-sm font-medium bg-indigo-600 text-white hover:bg-indigo-700 transition-all flex items-center justify-center"
+                                                        title="Edit petugas"
+                                                    >
                                                         <svg
                                                             xmlns="http://www.w3.org/2000/svg"
-                                                            className="h-5 w-5"
+                                                            className="h-4 w-4"
                                                             fill="none"
                                                             viewBox="0 0 24 24"
                                                             stroke="currentColor"
@@ -357,11 +479,11 @@ export default function Index({ schedules, auth }) {
                                                                 strokeLinecap="round"
                                                                 strokeLinejoin="round"
                                                                 strokeWidth={2}
-                                                                d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"
+                                                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
                                                             />
                                                         </svg>
-                                                    )}
-                                                </button>
+                                                    </button>
+                                                </div>
                                             </div>
 
                                             {/* Assignments */}
@@ -584,6 +706,14 @@ export default function Index({ schedules, auth }) {
                         )}
                     </div>
                 </div>
+
+                {/* Edit Modal */}
+                <ScheduleEditModal
+                    show={showEditModal}
+                    onClose={() => setShowEditModal(false)}
+                    schedule={editingSchedule}
+                    users={users}
+                />
             </div>
         </AuthenticatedLayout>
     );

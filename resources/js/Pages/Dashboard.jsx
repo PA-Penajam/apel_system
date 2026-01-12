@@ -1,12 +1,33 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { Head, Link } from "@inertiajs/react";
+import { Head, Link, router } from "@inertiajs/react";
+import { useState } from "react";
 
 export default function Dashboard({
     auth,
     stats,
     upcomingSchedules,
     recentSchedules,
+    failedNotifications,
+    failedCount,
 }) {
+    const [broadcastingId, setBroadcastingId] = useState(null);
+
+    const handleRetryNotification = (scheduleId) => {
+        if (confirm("Coba kirim notifikasi ulang untuk jadwal ini?")) {
+            setBroadcastingId(scheduleId);
+            router.post(
+                route("schedules.force-send"),
+                { schedule_id: scheduleId },
+                {
+                    onFinish: () => {
+                        setBroadcastingId(null);
+                        router.reload();
+                    },
+                },
+            );
+        }
+    };
+
     return (
         <AuthenticatedLayout
             user={auth.user}
@@ -88,24 +109,150 @@ export default function Dashboard({
                             </div>
                         </div>
 
-                        <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg border border-gray-100">
+                        <div
+                            className={`bg-white overflow-hidden shadow-sm sm:rounded-lg border ${
+                                failedCount > 0
+                                    ? "border-red-300"
+                                    : "border-gray-100"
+                            }`}
+                        >
                             <div className="p-6">
                                 <div className="flex items-center">
-                                    <div className="p-3 bg-purple-100 rounded-full">
-                                        <span className="text-2xl">👥</span>
+                                    <div
+                                        className={`p-3 rounded-full ${
+                                            failedCount > 0
+                                                ? "bg-red-100"
+                                                : "bg-gray-100"
+                                        }`}
+                                    >
+                                        <span className="text-2xl">🚨</span>
                                     </div>
                                     <div className="ml-4">
                                         <p className="text-sm font-medium text-gray-500">
-                                            Total Penugasan
+                                            Notif Gagal
                                         </p>
-                                        <p className="text-2xl font-bold text-gray-900">
-                                            {stats.total_assignments}
+                                        <p
+                                            className={`text-2xl font-bold ${
+                                                failedCount > 0
+                                                    ? "text-red-600"
+                                                    : "text-gray-900"
+                                            }`}
+                                        >
+                                            {failedCount}
                                         </p>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
+
+                    {/* Failed Notifications Alert */}
+                    {failedCount > 0 && (
+                        <div className="bg-red-50 overflow-hidden shadow-sm sm:rounded-lg border border-red-200">
+                            <div className="p-6">
+                                <div className="flex items-center justify-between mb-4">
+                                    <h3 className="text-lg font-semibold text-red-800 flex items-center gap-2">
+                                        <span>🚨</span>
+                                        Notifikasi Gagal - Perlu Tindakan
+                                    </h3>
+                                    <Link
+                                        href={route("schedules.index")}
+                                        className="text-sm text-red-600 hover:text-red-800 font-medium"
+                                    >
+                                        Lihat Semua →
+                                    </Link>
+                                </div>
+
+                                <div className="space-y-3">
+                                    {failedNotifications.map((schedule) => (
+                                        <div
+                                            key={schedule.id}
+                                            className="flex items-center justify-between p-4 bg-white rounded-lg border border-red-100"
+                                        >
+                                            <div className="flex items-center gap-4">
+                                                <div
+                                                    className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold ${
+                                                        schedule.type ===
+                                                        "senin"
+                                                            ? "bg-blue-500"
+                                                            : "bg-green-500"
+                                                    }`}
+                                                >
+                                                    {schedule.type === "senin"
+                                                        ? "1"
+                                                        : "6"}
+                                                </div>
+                                                <div>
+                                                    <p className="font-medium text-gray-900">
+                                                        {schedule.day_name},{" "}
+                                                        {new Date(
+                                                            schedule.date,
+                                                        ).toLocaleDateString(
+                                                            "id-ID",
+                                                            {
+                                                                day: "numeric",
+                                                                month: "long",
+                                                                year: "numeric",
+                                                            },
+                                                        )}
+                                                    </p>
+                                                    <p className="text-sm text-gray-500 capitalize">
+                                                        Apel {schedule.type} -{" "}
+                                                        <span className="text-red-600 font-medium">
+                                                            Notif Gagal
+                                                        </span>
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <button
+                                                onClick={() =>
+                                                    handleRetryNotification(
+                                                        schedule.id,
+                                                    )
+                                                }
+                                                disabled={
+                                                    broadcastingId ===
+                                                    schedule.id
+                                                }
+                                                className="px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 disabled:opacity-50 flex items-center gap-2 transition-colors"
+                                            >
+                                                {broadcastingId ===
+                                                schedule.id ? (
+                                                    <>
+                                                        <svg
+                                                            className="animate-spin h-4 w-4"
+                                                            viewBox="0 0 24 24"
+                                                        >
+                                                            <circle
+                                                                className="opacity-25"
+                                                                cx="12"
+                                                                cy="12"
+                                                                r="10"
+                                                                stroke="currentColor"
+                                                                strokeWidth="4"
+                                                                fill="none"
+                                                            />
+                                                            <path
+                                                                className="opacity-75"
+                                                                fill="currentColor"
+                                                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                                                            />
+                                                        </svg>
+                                                        Mengirim...
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <span>🔄</span>
+                                                        Coba Lagi
+                                                    </>
+                                                )}
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    )}
 
                     {/* Quick Actions */}
                     <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg border border-gray-100">
