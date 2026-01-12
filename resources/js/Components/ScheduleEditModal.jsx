@@ -11,11 +11,13 @@ export default function ScheduleEditModal({ show, onClose, schedule, users }) {
 
     useEffect(() => {
         if (show && schedule) {
-            const initialAssignments = schedule.assignments.map((assignment) => ({
-                id: assignment.id,
-                role: assignment.role,
-                user_id: assignment.user?.id || "",
-            }));
+            const initialAssignments = schedule.assignments.map(
+                (assignment) => ({
+                    id: assignment.id,
+                    role: assignment.role,
+                    user_id: assignment.user?.id || "",
+                }),
+            );
             setLocalAssignments(initialAssignments);
             setData("assignments", initialAssignments);
         }
@@ -26,8 +28,8 @@ export default function ScheduleEditModal({ show, onClose, schedule, users }) {
             prev.map((assignment) =>
                 assignment.id === assignmentId
                     ? { ...assignment, user_id: userId }
-                    : assignment
-            )
+                    : assignment,
+            ),
         );
     };
 
@@ -42,24 +44,54 @@ export default function ScheduleEditModal({ show, onClose, schedule, users }) {
     };
 
     const getRoleCriteria = (role) => {
+        // Sesuai dengan SchedulerService criteria
         const criteria = {
-            "Pembina Apel": ["Pegawai"],
-            "Pembaca Doa": ["Pegawai"],
-            "Pembaca 8 Nilai MA": ["Pegawai"],
-            MC: ["Pegawai"],
-            "Pemimpin Apel": ["Pegawai", "PPHP"],
-            "Pembaca Lainnya": ["Pegawai"],
+            "Pembina Apel": { jenis_jabatan: "pimpinan" },
+            "Pembaca Doa": { jenis_pegawai: ["PNS", "CPNS"], gender: "L" },
+            "Pembaca 8 Nilai MA": {
+                jenis_pegawai: "PNS",
+                jenis_jabatan: "Staff",
+                gender: "P",
+            },
+            MC: {
+                jenis_pegawai: ["CPNS", "PPPK"],
+                jenis_jabatan: "Staff",
+                gender: "P",
+            },
+            "Pemimpin Apel": { jenis_pegawai: "PPPK", gender: "L" },
+            "Pembaca Lainnya": {
+                jenis_pegawai: "CPNS",
+                jenis_jabatan: "Staff",
+            },
         };
-        return criteria[role] || ["Pegawai"];
+        return criteria[role] || {};
     };
 
     const getFilteredUsers = (role) => {
-        const allowedRoles = getRoleCriteria(role);
-        return users.filter((user) =>
-            allowedRoles.some((r) =>
-                user.roles?.some((ur) => ur.name.includes(r))
-            )
-        );
+        const criteria = getRoleCriteria(role);
+        return users.filter((user) => {
+            // Check jenis_jabatan
+            if (
+                criteria.jenis_jabatan &&
+                user.jenis_jabatan !== criteria.jenis_jabatan
+            ) {
+                return false;
+            }
+            // Check jenis_pegawai (bisa string atau array)
+            if (criteria.jenis_pegawai) {
+                const allowed = Array.isArray(criteria.jenis_pegawai)
+                    ? criteria.jenis_pegawai
+                    : [criteria.jenis_pegawai];
+                if (!allowed.includes(user.jenis_pegawai)) {
+                    return false;
+                }
+            }
+            // Check gender
+            if (criteria.gender && user.gender !== criteria.gender) {
+                return false;
+            }
+            return true;
+        });
     };
 
     const getRoleIcon = (role) => {
@@ -134,7 +166,8 @@ export default function ScheduleEditModal({ show, onClose, schedule, users }) {
                         })}
                     </p>
                     <p>
-                        <strong>Jenis:</strong> {schedule.type === "senin" ? "Senin" : "Jumat"}
+                        <strong>Jenis:</strong>{" "}
+                        {schedule.type === "senin" ? "Senin" : "Jumat"}
                     </p>
                 </div>
 
@@ -155,22 +188,31 @@ export default function ScheduleEditModal({ show, onClose, schedule, users }) {
                             <select
                                 value={assignment.user_id}
                                 onChange={(e) =>
-                                    handleUserChange(assignment.id, e.target.value)
+                                    handleUserChange(
+                                        assignment.id,
+                                        e.target.value,
+                                    )
                                 }
                                 disabled={processing}
                                 className="w-full mt-1 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                                 aria-label={`Pilih petugas untuk ${assignment.role}`}
                             >
                                 <option value="">-- Pilih Petugas --</option>
-                                {getFilteredUsers(assignment.role).map((user) => (
-                                    <option key={user.id} value={user.id}>
-                                        {user.name}
-                                    </option>
-                                ))}
+                                {getFilteredUsers(assignment.role).map(
+                                    (user) => (
+                                        <option key={user.id} value={user.id}>
+                                            {user.name}
+                                        </option>
+                                    ),
+                                )}
                             </select>
                             {errors[`assignments.${assignment.id}.user_id`] && (
                                 <p className="mt-1 text-sm text-red-600">
-                                    {errors[`assignments.${assignment.id}.user_id`]}
+                                    {
+                                        errors[
+                                            `assignments.${assignment.id}.user_id`
+                                        ]
+                                    }
                                 </p>
                             )}
                         </div>

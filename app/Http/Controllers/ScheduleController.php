@@ -29,11 +29,13 @@ class ScheduleController extends Controller
 
         return Inertia::render('Schedules/Index', [
             'schedules' => $schedules,
-            'users' => User::with('roles')->get()->map(function ($user) {
+            'users' => User::all()->map(function ($user) {
                 return [
                     'id' => $user->id,
                     'name' => $user->name,
-                    'roles' => $user->roles->map(fn ($role) => ['name' => $role->name]),
+                    'jenis_pegawai' => $user->jenis_pegawai,
+                    'jenis_jabatan' => $user->jenis_jabatan,
+                    'gender' => $user->gender,
                 ];
             }),
         ]);
