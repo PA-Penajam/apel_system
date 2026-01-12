@@ -366,25 +366,37 @@ class ScheduleController extends Controller
      */
     public function updatePetugas(Request $request, Schedule $schedule)
     {
-        $request->validate([
+        \Log::info('updatePetugas called', [
+            'schedule_id' => $schedule->id,
+            'assignments' => $request->assignments,
+        ]);
+
+        $validated = $request->validate([
             'assignments' => 'required|array',
             'assignments.*.id' => 'required|exists:assignments,id',
-            'assignments.*.user_id' => 'required|exists:users,id',
+            'assignments.*.user_id' => 'required|integer|exists:users,id',
             'assignments.*.role' => 'required|string|max:255',
         ]);
 
-        foreach ($request->assignments as $assignmentData) {
+        \Log::info('Validation passed', ['validated' => $validated]);
+
+        foreach ($validated['assignments'] as $assignmentData) {
             $assignment = Assignment::find($assignmentData['id']);
             if ($assignment && $assignment->schedule_id === $schedule->id) {
                 $assignment->update([
                     'user_id' => $assignmentData['user_id'],
                     'role' => $assignmentData['role'],
                 ]);
+                \Log::info('Assignment updated', ['assignment_id' => $assignment->id, 'user_id' => $assignmentData['user_id']]);
             }
         }
 
         // Reset notification status if assignments changed
         $schedule->update(['notification_status' => 'pending']);
+
+        if ($request->expectsJson()) {
+            return response()->json(['success' => true, 'message' => 'Petugas berhasil diperbarui.']);
+        }
 
         return redirect()->back()->with('success', 'Petugas berhasil diperbarui.');
     }
