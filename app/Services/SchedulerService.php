@@ -54,12 +54,25 @@ class SchedulerService
 
     protected function assignRoles(Schedule $schedule)
     {
-        // Get assigned user IDs to exclude from other roles
+        // Get week boundaries (Senin - Minggu)
+        $startOfWeek = Carbon::parse($schedule->date)->startOfWeek();
+        $endOfWeek = Carbon::parse($schedule->date)->endOfWeek();
+
+        // Get all user IDs who already have assignments in THIS week
+        // (user who worked earlier in the same week should not work again)
+        $assignedThisWeek = Assignment::whereHas('schedule', function ($query) use ($startOfWeek, $endOfWeek, $schedule) {
+            $query->whereBetween('date', [$startOfWeek, $endOfWeek])
+                ->where('id', '!=', $schedule->id); // Exclude current schedule
+        })->pluck('user_id')->unique()->toArray();
+
+        // Get assigned user IDs to exclude from other roles in SAME schedule
         $assignedIds = [];
 
         // 1. Pembina Apel: pimpinan (pimpinan)
-        $pembina = $this->selectCandidateForRole('Pembina Apel', function ($query) {
-            $query->where('jenis_jabatan', 'pimpinan');
+        $pembina = $this->selectCandidateForRole('Pembina Apel', function ($query) use (&$assignedIds, &$assignedThisWeek) {
+            $query->where('jenis_jabatan', 'pimpinan')
+                ->whereNotIn('id', $assignedIds)
+                ->whereNotIn('id', $assignedThisWeek);
         });
         $this->assign($schedule, $pembina, 'Pembina Apel');
         if ($pembina) {
@@ -67,10 +80,11 @@ class SchedulerService
         }
 
         // 2. Pembaca Doa: Laki-laki PNS + CPAPES
-        $doa = $this->selectCandidateForRole('Pembaca Doa', function ($query) use (&$assignedIds) {
+        $doa = $this->selectCandidateForRole('Pembaca Doa', function ($query) use (&$assignedIds, &$assignedThisWeek) {
             $query->whereIn('jenis_pegawai', ['PNS', 'CPNS'])
                 ->where('gender', 'L')
-                ->whereNotIn('id', $assignedIds);
+                ->whereNotIn('id', $assignedIds)
+                ->whereNotIn('id', $assignedThisWeek);
         });
         $this->assign($schedule, $doa, 'Pembaca Doa');
         if ($doa) {
@@ -78,11 +92,12 @@ class SchedulerService
         }
 
         // 3. Pembaca 8 Nilai MA: Perempuan PNS Staff
-        $nilai8 = $this->selectCandidateForRole('Pembaca 8 Nilai MA', function ($query) use (&$assignedIds) {
+        $nilai8 = $this->selectCandidateForRole('Pembaca 8 Nilai MA', function ($query) use (&$assignedIds, &$assignedThisWeek) {
             $query->where('jenis_pegawai', 'PNS')
                 ->where('jenis_jabatan', 'Staff')
                 ->where('gender', 'P')
-                ->whereNotIn('id', $assignedIds);
+                ->whereNotIn('id', $assignedIds)
+                ->whereNotIn('id', $assignedThisWeek);
         });
         $this->assign($schedule, $nilai8, 'Pembaca 8 Nilai MA');
         if ($nilai8) {
@@ -90,11 +105,12 @@ class SchedulerService
         }
 
         // 4. MC: Perempuan CPAPES/PPPK Staff
-        $mc = $this->selectCandidateForRole('MC', function ($query) use (&$assignedIds) {
+        $mc = $this->selectCandidateForRole('MC', function ($query) use (&$assignedIds, &$assignedThisWeek) {
             $query->whereIn('jenis_pegawai', ['CPNS', 'PPPK'])
                 ->where('jenis_jabatan', 'Staff')
                 ->where('gender', 'P')
-                ->whereNotIn('id', $assignedIds);
+                ->whereNotIn('id', $assignedIds)
+                ->whereNotIn('id', $assignedThisWeek);
         });
         $this->assign($schedule, $mc, 'MC');
         if ($mc) {
@@ -102,21 +118,23 @@ class SchedulerService
         }
 
         // 5. Pemimpin Apel: Laki-laki PPPK
-        $pemimpin = $this->selectCandidateForRole('Pemimpin Apel', function ($query) use (&$assignedIds) {
+        $pemimpin = $this->selectCandidateForRole('Pemimpin Apel', function ($query) use (&$assignedIds, &$assignedThisWeek) {
             $query->where('jenis_pegawai', 'PPPK')
                 ->where('gender', 'L')
-                ->whereNotIn('id', $assignedIds);
+                ->whereNotIn('id', $assignedIds)
+                ->whereNotIn('id', $assignedThisWeek);
         });
         $this->assign($schedule, $pemimpin, 'Pemimpin Apel');
         if ($pemimpin) {
             $assignedIds[] = $pemimpin->id;
         }
 
-        // 6. Pembaca Lainnya: CPAPES Staff (yang belum bertugas)
-        $lain = $this->selectCandidateForRole('Pembaca Lainnya', function ($query) use (&$assignedIds) {
+        // 6. Pembaca Lainnya: CPAPES Staff (yang belum bertugas di minggu ini)
+        $lain = $this->selectCandidateForRole('Pembaca Lainnya', function ($query) use (&$assignedIds, &$assignedThisWeek) {
             $query->where('jenis_pegawai', 'CPNS')
                 ->where('jenis_jabatan', 'Staff')
-                ->whereNotIn('id', $assignedIds);
+                ->whereNotIn('id', $assignedIds)
+                ->whereNotIn('id', $assignedThisWeek);
         });
         $this->assign($schedule, $lain, 'Pembaca Lainnya');
         if ($lain) {
