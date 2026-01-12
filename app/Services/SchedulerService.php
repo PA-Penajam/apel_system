@@ -16,18 +16,109 @@ class SchedulerService
     {
         $currentDate = $startDate->copy();
 
+        // Group dates by week (Senin as start of week)
+        $weeks = [];
         while ($currentDate <= $endDate) {
-            // Check if Monday or Friday
-            if ($currentDate->isMonday()) {
-                $this->createSchedule($currentDate, 'senin');
-            } elseif ($currentDate->isFriday()) {
-                $this->createSchedule($currentDate, 'jumat');
+            $weekStart = Carbon::parse($currentDate)->startOfWeek()->format('Y-m-d');
+            if (! isset($weeks[$weekStart])) {
+                $weeks[$weekStart] = [];
             }
+            $weeks[$weekStart][] = $currentDate->copy();
             $currentDate->addDay();
+        }
+
+        // For each week, determine the 6 officers first
+        foreach ($weeks as $weekStartDate => $dates) {
+            $seninDate = collect($dates)->firstWhere(fn ($d) => $d->isMonday());
+            $jumatDate = collect($dates)->firstWhere(fn ($d) => $d->isFriday());
+
+            if ($seninDate && $jumatDate) {
+                // Select 6 officers for this week
+                $officers = $this->selectOfficersForWeek($weekStartDate);
+
+                // Create Senin schedule
+                $this->createScheduleWithOfficers($seninDate, 'senin', $officers);
+
+                // Create Jumat schedule with SAME officers
+                $this->createScheduleWithOfficers($jumatDate, 'jumat', $officers);
+            } elseif ($seninDate) {
+                $this->createSchedule($seninDate, 'senin');
+            } elseif ($jumatDate) {
+                $this->createSchedule($jumatDate, 'jumat');
+            }
         }
     }
 
-    protected function createSchedule(Carbon $date, string $type)
+    /**
+     * Select 6 unique officers for the week based on fair rotation.
+     */
+    protected function selectOfficersForWeek(string $weekStartDate): array
+    {
+        // Get officers already used in previous weeks (for all roles)
+        $usedOfficers = Assignment::whereHas('schedule', function ($query) use ($weekStartDate) {
+            $query->where('date', '<', $weekStartDate);
+        })->pluck('user_id')->unique()->toArray();
+
+        // Get candidates for each role
+        $roles = [
+            'Pembina Apel' => function ($query) {
+                $query->where('jenis_jabatan', 'pimpinan');
+            },
+            'Pembaca Doa' => function ($query) {
+                $query->whereIn('jenis_pegawai', ['PNS', 'CPNS'])->where('gender', 'L');
+            },
+            'Pembaca 8 Nilai MA' => function ($query) {
+                $query->where('jenis_pegawai', 'PNS')->where('jenis_jabatan', 'Staff')->where('gender', 'P');
+            },
+            'MC' => function ($query) {
+                $query->whereIn('jenis_pegawai', ['CPNS', 'PPPK'])->where('jenis_jabatan', 'Staff')->where('gender', 'P');
+            },
+            'Pemimpin Apel' => function ($query) {
+                $query->where('jenis_pegawai', 'PPPK')->where('gender', 'L');
+            },
+            'Pembaca Lainnya' => function ($query) {
+                $query->where('jenis_pegawai', 'CPNS')->where('jenis_jabatan', 'Staff');
+            },
+        ];
+
+        $officers = [];
+        foreach ($roles as $roleName => $filter) {
+            $candidates = User::whereNotIn('id', $usedOfficers)->whereNotIn('id', array_column($officers, 'id'))->get();
+            $filter($candidates);
+
+            if ($candidates->isEmpty()) {
+                // Fallback: use candidates without excluding used officers
+                $candidates = User::whereNotIn('id', array_column($officers, 'id'))->get();
+                $filter($candidates);
+            }
+
+            // Sort by last assignment date for this role
+            $candidates = $candidates->sortBy(function ($user) use ($roleName) {
+                $lastAssignment = Assignment::where('user_id', $user->id)
+                    ->where('role', $roleName)
+                    ->join('schedules', 'assignments.schedule_id', '=', 'schedules.id')
+                    ->orderBy('schedules.date', 'desc')
+                    ->first();
+
+                return $lastAssignment ? $lastAssignment->date : '0000-00-00';
+            });
+
+            $selected = $candidates->first();
+            if ($selected) {
+                $officers[] = [
+                    'user_id' => $selected->id,
+                    'role' => $roleName,
+                ];
+            }
+        }
+
+        return $officers;
+    }
+
+    /**
+     * Create a schedule with pre-selected officers.
+     */
+    protected function createScheduleWithOfficers(Carbon $date, string $type, array $officers)
     {
         // Check if schedule exists
         if (Schedule::where('date', $date->format('Y-m-d'))->exists()) {
@@ -35,11 +126,41 @@ class SchedulerService
         }
 
         // Calculate scheduled notification time
-        // Senin: 07:00 WITA (1 jam sebelum apel jam 08:00)
-        // Jumat: 08:00 WITA (8 jam sebelum apel jam 16:00)
         $notificationTime = $type === 'senin'
-            ? $date->copy()->setTime(7, 0, 0)  // Senin jam 07:00
-            : $date->copy()->setTime(8, 0, 0); // Jumat jam 08:00
+            ? $date->copy()->setTime(7, 0, 0)
+            : $date->copy()->setTime(8, 0, 0);
+
+        $schedule = Schedule::create([
+            'date' => $date->format('Y-m-d'),
+            'type' => $type,
+            'scheduled_notification_at' => $notificationTime,
+            'notification_status' => 'pending',
+            'is_auto_notification' => true,
+        ]);
+
+        // Assign the same officers
+        foreach ($officers as $officer) {
+            Assignment::create([
+                'schedule_id' => $schedule->id,
+                'user_id' => $officer['user_id'],
+                'role' => $officer['role'],
+            ]);
+        }
+    }
+
+    /**
+     * Create schedule (fallback for single day).
+     */
+    protected function createSchedule(Carbon $date, string $type)
+    {
+        // Check if schedule exists
+        if (Schedule::where('date', $date->format('Y-m-d'))->exists()) {
+            return;
+        }
+
+        $notificationTime = $type === 'senin'
+            ? $date->copy()->setTime(7, 0, 0)
+            : $date->copy()->setTime(8, 0, 0);
 
         $schedule = Schedule::create([
             'date' => $date->format('Y-m-d'),
