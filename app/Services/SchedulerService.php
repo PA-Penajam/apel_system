@@ -83,13 +83,20 @@ class SchedulerService
 
         $officers = [];
         foreach ($roles as $roleName => $filter) {
-            $candidates = User::whereNotIn('id', $usedOfficers)->whereNotIn('id', array_column($officers, 'id'))->get();
-            $filter($candidates);
+            // Build query with exclusions first
+            $query = User::whereNotIn('id', $usedOfficers)
+                ->whereNotIn('id', array_column($officers, 'user_id'));
+
+            // Apply role-specific filter to query builder
+            $filter($query);
+
+            $candidates = $query->get();
 
             if ($candidates->isEmpty()) {
                 // Fallback: use candidates without excluding used officers
-                $candidates = User::whereNotIn('id', array_column($officers, 'id'))->get();
-                $filter($candidates);
+                $query2 = User::whereNotIn('id', array_column($officers, 'user_id'));
+                $filter($query2);
+                $candidates = $query2->get();
             }
 
             // Sort by last assignment date for this role
