@@ -65,19 +65,19 @@ class SchedulerService
                 $query->where('jenis_jabatan', 'pimpinan');
             },
             'Pembaca Doa' => function ($query) {
-                $query->whereIn('jenis_pegawai', ['PNS', 'CPNS'])->where('gender', 'L');
+                $query->whereIn('jenis_pegawai', ['PNS', 'CPNS'])->where('jenis_jabatan', '!=', 'pimpinan')->where('gender', 'L');
             },
             'Pembaca 8 Nilai MA' => function ($query) {
                 $query->where('jenis_pegawai', 'PNS')->where('jenis_jabatan', '!=', 'pimpinan')->where('gender', 'P');
             },
             'MC' => function ($query) {
-                $query->whereIn('jenis_pegawai', ['CPNS', 'PPPK'])->where('jenis_jabatan', 'Staff')->where('gender', 'P');
+                $query->whereIn('jenis_pegawai', ['CPNS', 'PPPK'])->where('jenis_jabatan', '!=', 'pimpinan')->where('jenis_jabatan', 'Staff')->where('gender', 'P');
             },
             'Pemimpin Apel' => function ($query) {
-                $query->where('jenis_pegawai', 'PPPK')->where('gender', 'L');
+                $query->where('jenis_pegawai', 'PPPK')->where('jenis_jabatan', '!=', 'pimpinan')->where('gender', 'L');
             },
             'Pembaca Lainnya' => function ($query) {
-                $query->whereIn('jenis_pegawai', ['PNS', 'CPNS'])->where('jenis_jabatan', 'Staff');
+                $query->whereIn('jenis_pegawai', ['PNS', 'CPNS'])->where('jenis_jabatan', '!=', 'pimpinan')->where('jenis_jabatan', 'Staff');
             },
         ];
 

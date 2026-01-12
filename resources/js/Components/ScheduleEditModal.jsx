@@ -47,7 +47,11 @@ export default function ScheduleEditModal({ show, onClose, schedule, users }) {
         // Sesuai dengan SchedulerService criteria
         const criteria = {
             "Pembina Apel": { jenis_jabatan: "pimpinan" },
-            "Pembaca Doa": { jenis_pegawai: ["PNS", "CPNS"], gender: "L" },
+            "Pembaca Doa": {
+                jenis_pegawai: ["PNS", "CPNS"],
+                jenis_jabatan: "!pimpinan",
+                gender: "L",
+            },
             "Pembaca 8 Nilai MA": {
                 jenis_pegawai: "PNS",
                 jenis_jabatan: "!pimpinan",
@@ -55,13 +59,17 @@ export default function ScheduleEditModal({ show, onClose, schedule, users }) {
             },
             MC: {
                 jenis_pegawai: ["CPNS", "PPPK"],
-                jenis_jabatan: "Staff",
+                jenis_jabatan: ["!pimpinan", "Staff"],
                 gender: "P",
             },
-            "Pemimpin Apel": { jenis_pegawai: "PPPK", gender: "L" },
+            "Pemimpin Apel": {
+                jenis_pegawai: "PPPK",
+                jenis_jabatan: "!pimpinan",
+                gender: "L",
+            },
             "Pembaca Lainnya": {
                 jenis_pegawai: ["PNS", "CPNS"],
-                jenis_jabatan: "Staff",
+                jenis_jabatan: ["!pimpinan", "Staff"],
             },
         };
         return criteria[role] || {};
@@ -70,23 +78,61 @@ export default function ScheduleEditModal({ show, onClose, schedule, users }) {
     const getFilteredUsers = (role) => {
         const criteria = getRoleCriteria(role);
         return users.filter((user) => {
-            // Check jenis_jabatan (case-insensitive)
+            // Check jenis_jabatan (bisa string, array, atau negation)
             if (criteria.jenis_jabatan) {
-                if (criteria.jenis_jabatan.startsWith("!")) {
-                    // Negation: harus TIDAK sama dengan
-                    const excluded = criteria.jenis_jabatan
-                        .substring(1)
-                        .toLowerCase();
-                    if (user.jenis_jabatan?.toLowerCase() === excluded) {
-                        return false;
+                const jab = criteria.jenis_jabatan;
+
+                if (Array.isArray(jab)) {
+                    // Array: harus match SATU dari item (OR logic)
+                    let passed = false;
+                    for (const item of jab) {
+                        if (item.startsWith("!")) {
+                            // Negation: TIDAK boleh ini, tapi jika ada item lain yang match, tetap boleh
+                            const excluded = item.substring(1).toLowerCase();
+                            if (
+                                user.jenis_jabatan?.toLowerCase() !== excluded
+                            ) {
+                                // Check apakah ada item lain yang match positive
+                                const hasPositiveMatch = jab.some(
+                                    (i) =>
+                                        !i.startsWith("!") &&
+                                        i.toLowerCase() ===
+                                            user.jenis_jabatan?.toLowerCase(),
+                                );
+                                if (hasPositiveMatch) {
+                                    passed = true;
+                                } else if (
+                                    !jab.some((i) => !i.startsWith("!"))
+                                ) {
+                                    // Jika semua item negation, berarti只要 bukan excluded
+                                    passed = true;
+                                }
+                            }
+                        } else {
+                            // Positive: HARUS ini
+                            if (
+                                user.jenis_jabatan?.toLowerCase() ===
+                                item.toLowerCase()
+                            ) {
+                                passed = true;
+                            }
+                        }
                     }
+                    if (!passed) return false;
                 } else {
-                    // Positive: harus sama dengan
-                    if (
-                        user.jenis_jabatan?.toLowerCase() !==
-                        criteria.jenis_jabatan.toLowerCase()
-                    ) {
-                        return false;
+                    // Single value
+                    if (jab.startsWith("!")) {
+                        const excluded = jab.substring(1).toLowerCase();
+                        if (user.jenis_jabatan?.toLowerCase() === excluded) {
+                            return false;
+                        }
+                    } else {
+                        if (
+                            user.jenis_jabatan?.toLowerCase() !==
+                            jab.toLowerCase()
+                        ) {
+                            return false;
+                        }
                     }
                 }
             }
@@ -190,51 +236,62 @@ export default function ScheduleEditModal({ show, onClose, schedule, users }) {
                 </div>
 
                 <div className="space-y-4 max-h-96 overflow-y-auto">
-                    {localAssignments.map((assignment) => (
-                        <div
-                            key={assignment.id}
-                            className={`p-4 rounded-lg border ${getRoleColor(assignment.role)}`}
-                        >
-                            <div className="flex items-center gap-2 mb-2">
-                                <span className="text-lg">
-                                    {getRoleIcon(assignment.role)}
-                                </span>
-                                <span className="font-medium">
-                                    {assignment.role}
-                                </span>
-                            </div>
-                            <select
-                                value={assignment.user_id}
-                                onChange={(e) =>
-                                    handleUserChange(
-                                        assignment.id,
-                                        e.target.value,
-                                    )
-                                }
-                                disabled={processing}
-                                className="w-full mt-1 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                                aria-label={`Pilih petugas untuk ${assignment.role}`}
+                    {localAssignments.map((assignment) => {
+                        const filteredUsers = getFilteredUsers(assignment.role);
+                        return (
+                            <div
+                                key={assignment.id}
+                                className={`p-4 rounded-lg border ${getRoleColor(assignment.role)}`}
                             >
-                                <option value="">-- Pilih Petugas --</option>
-                                {getFilteredUsers(assignment.role).map(
-                                    (user) => (
+                                <div className="flex items-center gap-2 mb-2">
+                                    <span className="text-lg">
+                                        {getRoleIcon(assignment.role)}
+                                    </span>
+                                    <span className="font-medium">
+                                        {assignment.role}
+                                    </span>
+                                </div>
+                                <select
+                                    value={assignment.user_id}
+                                    onChange={(e) =>
+                                        handleUserChange(
+                                            assignment.id,
+                                            e.target.value,
+                                        )
+                                    }
+                                    disabled={processing}
+                                    className="w-full mt-1 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                    aria-label={`Pilih petugas untuk ${assignment.role}`}
+                                >
+                                    <option value="">
+                                        -- Pilih Petugas --
+                                    </option>
+                                    {filteredUsers.map((user) => (
                                         <option key={user.id} value={user.id}>
                                             {user.name}
                                         </option>
-                                    ),
+                                    ))}
+                                </select>
+                                {filteredUsers.length === 0 && (
+                                    <p className="mt-1 text-sm text-red-600">
+                                        Tidak ada petugas yang eligible untuk
+                                        role ini
+                                    </p>
                                 )}
-                            </select>
-                            {errors[`assignments.${assignment.id}.user_id`] && (
-                                <p className="mt-1 text-sm text-red-600">
-                                    {
-                                        errors[
-                                            `assignments.${assignment.id}.user_id`
-                                        ]
-                                    }
-                                </p>
-                            )}
-                        </div>
-                    ))}
+                                {errors[
+                                    `assignments.${assignment.id}.user_id`
+                                ] && (
+                                    <p className="mt-1 text-sm text-red-600">
+                                        {
+                                            errors[
+                                                `assignments.${assignment.id}.user_id`
+                                            ]
+                                        }
+                                    </p>
+                                )}
+                            </div>
+                        );
+                    })}
                 </div>
 
                 <div className="mt-6 flex justify-end gap-3">
