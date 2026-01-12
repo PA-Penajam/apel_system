@@ -394,10 +394,6 @@ class ScheduleController extends Controller
         // Reset notification status if assignments changed
         $schedule->update(['notification_status' => 'pending']);
 
-        if ($request->expectsJson()) {
-            return response()->json(['success' => true, 'message' => 'Petugas berhasil diperbarui.']);
-        }
-
-        return redirect()->back()->with('success', 'Petugas berhasil diperbarui.');
+        return Inertia::back()->with('success', 'Petugas berhasil diperbarui.');
     }
 }

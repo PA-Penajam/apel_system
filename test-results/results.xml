@@ -1,0 +1,122 @@
+<testsuites id="" name="" tests="4" failures="2" skipped="0" errors="0" time="122.720009">
+<testsuite name="schedule-editing.spec.ts" timestamp="2026-01-12T06:01:05.488Z" hostname="chromium" tests="4" failures="2" skipped="0" time="137.931" errors="0">
+<testcase name="Schedule Editing Workflow › can login and edit schedule officers" classname="schedule-editing.spec.ts" time="121.957">
+<failure message="schedule-editing.spec.ts:14:5 can login and edit schedule officers" type="FAILURE">
+<![CDATA[  [chromium] › schedule-editing.spec.ts:14:5 › Schedule Editing Workflow › can login and edit schedule officers 
+
+    Test timeout of 120000ms exceeded.
+
+    Error: page.click: Test timeout of 120000ms exceeded.
+    Call log:
+      - waiting for locator('text=Dashboard')
+        - locator resolved to 2 elements. Proceeding with the first one: <a href="http://localhost:8000/dashboard" class="inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium leading-5 transition duration-150 ease-in-out focus:outline-none border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 focus:border-gray-300 focus:text-gray-700">Dashboard</a>
+      - attempting click action
+        2 × waiting for element to be visible, enabled and stable
+          - element is visible, enabled and stable
+          - scrolling into view if needed
+          - done scrolling
+          - <div class="absolute inset-0 bg-gray-500/75"></div> from <div id="headlessui-portal-root">…</div> subtree intercepts pointer events
+        - retrying click action
+        - waiting 20ms
+        2 × waiting for element to be visible, enabled and stable
+          - element is visible, enabled and stable
+          - scrolling into view if needed
+          - done scrolling
+          - <div class="absolute inset-0 bg-gray-500/75"></div> from <div id="headlessui-portal-root">…</div> subtree intercepts pointer events
+        - retrying click action
+          - waiting 100ms
+        212 × waiting for element to be visible, enabled and stable
+            - element is visible, enabled and stable
+            - scrolling into view if needed
+            - done scrolling
+            - <div class="absolute inset-0 bg-gray-500/75"></div> from <div id="headlessui-portal-root">…</div> subtree intercepts pointer events
+          - retrying click action
+            - waiting 500ms
+
+
+      85 |
+      86 |         // Navigate away and back to refresh data
+    > 87 |         await page.click("text=Dashboard");
+         |                    ^
+      88 |         await expect(page).toHaveURL(/.*dashboard/);
+      89 |         await page.click("text=Jadwal Apel");
+      90 |         await expect(page).toHaveURL(/.*schedules/);
+        at /Volumes/Home/moohard/Kerjaan-Kepegawaian/apel-app/tests/e2e/schedule-editing.spec.ts:87:20
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/schedule-editing-Schedule--93099--and-edit-schedule-officers-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/schedule-editing-Schedule--93099--and-edit-schedule-officers-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/schedule-editing-Schedule--93099--and-edit-schedule-officers-chromium/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[Original assignment: NUR RIZKA FANI, S.H.
+Original user ID: 4
+Changed to user ID: 2
+Modal still visible: [33mtrue[39m
+Modal did not close, but checking if database was updated...
+
+[[ATTACHMENT|schedule-editing-Schedule--93099--and-edit-schedule-officers-chromium/test-failed-1.png]]
+
+[[ATTACHMENT|schedule-editing-Schedule--93099--and-edit-schedule-officers-chromium/video.webm]]
+
+[[ATTACHMENT|schedule-editing-Schedule--93099--and-edit-schedule-officers-chromium/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Schedule Editing Workflow › verifies database update via API after editing" classname="schedule-editing.spec.ts" time="5.543">
+<failure message="schedule-editing.spec.ts:100:5 verifies database update via API after editing" type="FAILURE">
+<![CDATA[  [chromium] › schedule-editing.spec.ts:100:5 › Schedule Editing Workflow › verifies database update via API after editing 
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: 200
+    Received: 404
+
+      144 |             `http://localhost:8000/api/schedules/${scheduleId}`,
+      145 |         );
+    > 146 |         expect(response.status()).toBe(200);
+          |                                   ^
+      147 |
+      148 |         // The database update verification test shows the database IS being updated
+      149 |         console.log(
+        at /Volumes/Home/moohard/Kerjaan-Kepegawaian/apel-app/tests/e2e/schedule-editing.spec.ts:146:35
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../test-results/schedule-editing-Schedule--c2b75-pdate-via-API-after-editing-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../test-results/schedule-editing-Schedule--c2b75-pdate-via-API-after-editing-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../test-results/schedule-editing-Schedule--c2b75-pdate-via-API-after-editing-chromium/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|schedule-editing-Schedule--c2b75-pdate-via-API-after-editing-chromium/test-failed-1.png]]
+
+[[ATTACHMENT|schedule-editing-Schedule--c2b75-pdate-via-API-after-editing-chromium/video.webm]]
+
+[[ATTACHMENT|schedule-editing-Schedule--c2b75-pdate-via-API-after-editing-chromium/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="Dashboard Schedule Detail Modal › can view schedule details from dashboard" classname="schedule-editing.spec.ts" time="2.667">
+</testcase>
+<testcase name="Database Verification › verifies assignment was updated in database" classname="schedule-editing.spec.ts" time="7.764">
+<system-out>
+<![CDATA[Changed user from 4 to 2
+Database update verified: The updatePetugas method in ScheduleController.php
+correctly updates the assignments in the database!
+]]>
+</system-out>
+</testcase>
+</testsuite>
+</testsuites>

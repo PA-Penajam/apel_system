@@ -1,0 +1,424 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - navigation [ref=e4]:
+      - generic [ref=e6]:
+        - generic [ref=e7]:
+          - link [ref=e9] [cursor=pointer]:
+            - /url: /
+            - img [ref=e10]
+          - generic [ref=e12]:
+            - link "Dashboard" [ref=e13] [cursor=pointer]:
+              - /url: http://localhost:8000/dashboard
+            - link "Jadwal Apel" [ref=e14] [cursor=pointer]:
+              - /url: http://localhost:8000/schedules
+        - button "Test User" [ref=e20] [cursor=pointer]:
+          - text: Test User
+          - img [ref=e21]
+    - banner [ref=e23]:
+      - heading "📅 Jadwal Apel" [level=2] [ref=e25]
+    - main [ref=e26]:
+      - generic [ref=e28]:
+        - generic [ref=e30]:
+          - generic [ref=e31]:
+            - generic [ref=e32]: ⚙️
+            - generic [ref=e33]:
+              - heading "Generate Jadwal Baru" [level=3] [ref=e34]
+              - paragraph [ref=e35]: Buat jadwal otomatis dengan distribusi petugas yang merata
+          - generic [ref=e36]:
+            - generic [ref=e37]:
+              - generic [ref=e38]: Tanggal Mulai
+              - textbox [ref=e39]
+            - generic [ref=e40]:
+              - generic [ref=e41]: Tanggal Selesai
+              - textbox [ref=e42]
+            - button "🚀 Generate Jadwal" [ref=e43] [cursor=pointer]:
+              - generic [ref=e44]: 🚀
+              - text: Generate Jadwal
+        - generic [ref=e45]:
+          - generic [ref=e46]:
+            - heading "📆 January 2026" [level=3] [ref=e47]:
+              - generic [ref=e48]: 📆
+              - text: January 2026
+            - generic [ref=e50]: 5 jadwal
+          - generic [ref=e51]:
+            - generic [ref=e52]:
+              - generic [ref=e53]:
+                - generic [ref=e54]:
+                  - generic [ref=e55]:
+                    - generic [ref=e56]: 1️⃣
+                    - generic [ref=e57]:
+                      - text: senin
+                      - paragraph [ref=e58]: 26 Januari 2026
+                  - generic [ref=e59]: Pending
+                - generic [ref=e60]:
+                  - button "Kirim Grup" [ref=e61] [cursor=pointer]:
+                    - img [ref=e62]
+                    - text: Kirim Grup
+                  - button "Kirim Manual" [ref=e64] [cursor=pointer]:
+                    - img [ref=e65]
+                    - text: Kirim Manual
+                  - button "Edit petugas" [ref=e67] [cursor=pointer]:
+                    - img [ref=e68]
+              - generic [ref=e70]:
+                - generic [ref=e71]:
+                  - generic [ref=e72]: 👔
+                  - generic [ref=e73]:
+                    - paragraph [ref=e74]: Pembina Apel
+                    - paragraph [ref=e75]: NUR RIZKA FANI, S.H.
+                - generic [ref=e76]:
+                  - generic [ref=e77]: 🤲
+                  - generic [ref=e78]:
+                    - paragraph [ref=e79]: Pembaca Doa
+                    - paragraph [ref=e80]: MUHAMMAD HAMDI, S.H., M.Hum.
+                - generic [ref=e81]:
+                  - generic [ref=e82]: 📖
+                  - generic [ref=e83]:
+                    - paragraph [ref=e84]: Pembaca 8 Nilai MA
+                    - paragraph [ref=e85]: CUCU KHOFIFAH, S.H.
+                - generic [ref=e86]:
+                  - generic [ref=e87]: 🎤
+                  - generic [ref=e88]:
+                    - paragraph [ref=e89]: MC
+                    - paragraph [ref=e90]: NOVAYANTI, S.H.
+                - generic [ref=e91]:
+                  - generic [ref=e92]: ⭐
+                  - generic [ref=e93]:
+                    - paragraph [ref=e94]: Pemimpin Apel
+                    - paragraph [ref=e95]: AMIN NUR
+                - generic [ref=e96]:
+                  - generic [ref=e97]: 📋
+                  - generic [ref=e98]:
+                    - paragraph [ref=e99]: Pembaca Lainnya
+                    - paragraph [ref=e100]: NUR MUFLIHAH P.W., S.T.
+              - paragraph [ref=e102]: 6 penugasan
+            - generic [ref=e103]:
+              - generic [ref=e104]:
+                - generic [ref=e105]:
+                  - generic [ref=e106]:
+                    - generic [ref=e107]: 6️⃣
+                    - generic [ref=e108]:
+                      - text: jumat
+                      - paragraph [ref=e109]: 23 Januari 2026
+                  - generic [ref=e110]: Pending
+                - generic [ref=e111]:
+                  - button "Kirim Grup" [ref=e112] [cursor=pointer]:
+                    - img [ref=e113]
+                    - text: Kirim Grup
+                  - button "Kirim Manual" [ref=e115] [cursor=pointer]:
+                    - img [ref=e116]
+                    - text: Kirim Manual
+                  - button "Edit petugas" [ref=e118] [cursor=pointer]:
+                    - img [ref=e119]
+              - generic [ref=e121]:
+                - generic [ref=e122]:
+                  - generic [ref=e123]: 👔
+                  - generic [ref=e124]:
+                    - paragraph [ref=e125]: Pembina Apel
+                    - paragraph [ref=e126]: NAHDIYANTI, S.H.I., M.H.
+                - generic [ref=e127]:
+                  - generic [ref=e128]: 🤲
+                  - generic [ref=e129]:
+                    - paragraph [ref=e130]: Pembaca Doa
+                    - paragraph [ref=e131]: MUHAMMAD ZAIM NOOR, S.H.
+                - generic [ref=e132]:
+                  - generic [ref=e133]: 📖
+                  - generic [ref=e134]:
+                    - paragraph [ref=e135]: Pembaca 8 Nilai MA
+                    - paragraph [ref=e136]: FARIDAH FITRIYANI, S.H.I.
+                - generic [ref=e137]:
+                  - generic [ref=e138]: 🎤
+                  - generic [ref=e139]:
+                    - paragraph [ref=e140]: MC
+                    - paragraph [ref=e141]: NURAVITA PRAMESTI, A.Md.
+                - generic [ref=e142]:
+                  - generic [ref=e143]: ⭐
+                  - generic [ref=e144]:
+                    - paragraph [ref=e145]: Pemimpin Apel
+                    - paragraph [ref=e146]: ASHAR, S.H.
+                - generic [ref=e147]:
+                  - generic [ref=e148]: 📋
+                  - generic [ref=e149]:
+                    - paragraph [ref=e150]: Pembaca Lainnya
+                    - paragraph [ref=e151]: QURROTU AINI, S.H.
+              - paragraph [ref=e153]: 6 penugasan
+            - generic [ref=e154]:
+              - generic [ref=e155]:
+                - generic [ref=e156]:
+                  - generic [ref=e157]:
+                    - generic [ref=e158]: 1️⃣
+                    - generic [ref=e159]:
+                      - text: senin
+                      - paragraph [ref=e160]: 19 Januari 2026
+                  - generic [ref=e161]: Pending
+                - generic [ref=e162]:
+                  - button "Kirim Grup" [ref=e163] [cursor=pointer]:
+                    - img [ref=e164]
+                    - text: Kirim Grup
+                  - button "Kirim Manual" [ref=e166] [cursor=pointer]:
+                    - img [ref=e167]
+                    - text: Kirim Manual
+                  - button "Edit petugas" [ref=e169] [cursor=pointer]:
+                    - img [ref=e170]
+              - generic [ref=e172]:
+                - generic [ref=e173]:
+                  - generic [ref=e174]: 👔
+                  - generic [ref=e175]:
+                    - paragraph [ref=e176]: Pembina Apel
+                    - paragraph [ref=e177]: NAHDIYANTI, S.H.I., M.H.
+                - generic [ref=e178]:
+                  - generic [ref=e179]: 🤲
+                  - generic [ref=e180]:
+                    - paragraph [ref=e181]: Pembaca Doa
+                    - paragraph [ref=e182]: MUHAMMAD ZAIM NOOR, S.H.
+                - generic [ref=e183]:
+                  - generic [ref=e184]: 📖
+                  - generic [ref=e185]:
+                    - paragraph [ref=e186]: Pembaca 8 Nilai MA
+                    - paragraph [ref=e187]: FARIDAH FITRIYANI, S.H.I.
+                - generic [ref=e188]:
+                  - generic [ref=e189]: 🎤
+                  - generic [ref=e190]:
+                    - paragraph [ref=e191]: MC
+                    - paragraph [ref=e192]: NURAVITA PRAMESTI, A.Md.
+                - generic [ref=e193]:
+                  - generic [ref=e194]: ⭐
+                  - generic [ref=e195]:
+                    - paragraph [ref=e196]: Pemimpin Apel
+                    - paragraph [ref=e197]: ASHAR, S.H.
+                - generic [ref=e198]:
+                  - generic [ref=e199]: 📋
+                  - generic [ref=e200]:
+                    - paragraph [ref=e201]: Pembaca Lainnya
+                    - paragraph [ref=e202]: QURROTU AINI, S.H.
+              - paragraph [ref=e204]: 6 penugasan
+            - generic [ref=e205]:
+              - generic [ref=e206]:
+                - generic [ref=e207]:
+                  - generic [ref=e208]:
+                    - generic [ref=e209]: 6️⃣
+                    - generic [ref=e210]:
+                      - text: jumat
+                      - paragraph [ref=e211]: 16 Januari 2026
+                  - generic [ref=e212]: Pending
+                - generic [ref=e213]:
+                  - button "Kirim Grup" [ref=e214] [cursor=pointer]:
+                    - img [ref=e215]
+                    - text: Kirim Grup
+                  - button "Kirim Manual" [ref=e217] [cursor=pointer]:
+                    - img [ref=e218]
+                    - text: Kirim Manual
+                  - button "Edit petugas" [ref=e220] [cursor=pointer]:
+                    - img [ref=e221]
+              - generic [ref=e223]:
+                - generic [ref=e224]:
+                  - generic [ref=e225]: 👔
+                  - generic [ref=e226]:
+                    - paragraph [ref=e227]: Pembina Apel
+                    - paragraph [ref=e228]: FATTAHURRIDLO AL GHANY, S.H.I., M.S.I.
+                - generic [ref=e229]:
+                  - generic [ref=e230]: 🤲
+                  - generic [ref=e231]:
+                    - paragraph [ref=e232]: Pembaca Doa
+                    - paragraph [ref=e233]: AWALUDDIN NUR, S.H.I.
+                - generic [ref=e234]:
+                  - generic [ref=e235]: 📖
+                  - generic [ref=e236]:
+                    - paragraph [ref=e237]: Pembaca 8 Nilai MA
+                    - paragraph [ref=e238]: NUZULA YUSTISIA, S.H.I.
+                - generic [ref=e239]:
+                  - generic [ref=e240]: 🎤
+                  - generic [ref=e241]:
+                    - paragraph [ref=e242]: MC
+                    - paragraph [ref=e243]: NUR MUFLIHAH P.W., S.T.
+                - generic [ref=e244]:
+                  - generic [ref=e245]: ⭐
+                  - generic [ref=e246]:
+                    - paragraph [ref=e247]: Pemimpin Apel
+                    - paragraph [ref=e248]: DAMAI AZIZU, S.Kom.
+                - generic [ref=e249]:
+                  - generic [ref=e250]: 📋
+                  - generic [ref=e251]:
+                    - paragraph [ref=e252]: Pembaca Lainnya
+                    - paragraph [ref=e253]: MUHAMMAD ILHAM, S.H., M.Kn.
+              - paragraph [ref=e255]: 6 penugasan
+            - generic [ref=e256]:
+              - generic [ref=e257]:
+                - generic [ref=e258]:
+                  - generic [ref=e259]:
+                    - generic [ref=e260]: 1️⃣
+                    - generic [ref=e261]:
+                      - text: senin
+                      - paragraph [ref=e262]: 12 Januari 2026
+                  - generic [ref=e263]: Pending
+                - generic [ref=e264]:
+                  - button "Kirim Grup" [ref=e265] [cursor=pointer]:
+                    - img [ref=e266]
+                    - text: Kirim Grup
+                  - button "Kirim Manual" [ref=e268] [cursor=pointer]:
+                    - img [ref=e269]
+                    - text: Kirim Manual
+                  - button "Edit petugas" [ref=e271] [cursor=pointer]:
+                    - img [ref=e272]
+              - generic [ref=e274]:
+                - generic [ref=e275]:
+                  - generic [ref=e276]: 👔
+                  - generic [ref=e277]:
+                    - paragraph [ref=e278]: Pembina Apel
+                    - paragraph [ref=e279]: FATTAHURRIDLO AL GHANY, S.H.I., M.S.I.
+                - generic [ref=e280]:
+                  - generic [ref=e281]: 🤲
+                  - generic [ref=e282]:
+                    - paragraph [ref=e283]: Pembaca Doa
+                    - paragraph [ref=e284]: AWALUDDIN NUR, S.H.I.
+                - generic [ref=e285]:
+                  - generic [ref=e286]: 📖
+                  - generic [ref=e287]:
+                    - paragraph [ref=e288]: Pembaca 8 Nilai MA
+                    - paragraph [ref=e289]: NUZULA YUSTISIA, S.H.I.
+                - generic [ref=e290]:
+                  - generic [ref=e291]: 🎤
+                  - generic [ref=e292]:
+                    - paragraph [ref=e293]: MC
+                    - paragraph [ref=e294]: NUR MUFLIHAH P.W., S.T.
+                - generic [ref=e295]:
+                  - generic [ref=e296]: ⭐
+                  - generic [ref=e297]:
+                    - paragraph [ref=e298]: Pemimpin Apel
+                    - paragraph [ref=e299]: DAMAI AZIZU, S.Kom.
+                - generic [ref=e300]:
+                  - generic [ref=e301]: 📋
+                  - generic [ref=e302]:
+                    - paragraph [ref=e303]: Pembaca Lainnya
+                    - paragraph [ref=e304]: MUHAMMAD ILHAM, S.H., M.Kn.
+              - paragraph [ref=e306]: 6 penugasan
+        - generic [ref=e307]:
+          - heading "📋 Keterangan Peran" [level=4] [ref=e308]
+          - generic [ref=e309]:
+            - generic [ref=e310]:
+              - generic [ref=e311]: 👔
+              - generic [ref=e312]: Pembina Apel
+            - generic [ref=e313]:
+              - generic [ref=e314]: 🤲
+              - generic [ref=e315]: Pembaca Doa
+            - generic [ref=e316]:
+              - generic [ref=e317]: 📖
+              - generic [ref=e318]: Pembaca 8 Nilai
+            - generic [ref=e319]:
+              - generic [ref=e320]: 🎤
+              - generic [ref=e321]: MC
+            - generic [ref=e322]:
+              - generic [ref=e323]: ⭐
+              - generic [ref=e324]: Pemimpin Apel
+            - generic [ref=e325]:
+              - generic [ref=e326]: 📋
+              - generic [ref=e327]: Pembaca Lainnya
+        - generic [ref=e328]:
+          - heading "📱 Status Fonnte WhatsApp" [level=4] [ref=e329]:
+            - generic [ref=e330]: 📱
+            - text: Status Fonnte WhatsApp
+          - generic [ref=e331]:
+            - button "🔗 Test Koneksi" [ref=e332] [cursor=pointer]:
+              - generic [ref=e333]: 🔗
+              - text: Test Koneksi
+            - button "📊 Cek Kuota" [ref=e334] [cursor=pointer]:
+              - generic [ref=e335]: 📊
+              - text: Cek Kuota
+  - dialog [ref=e336]:
+    - generic [ref=e339]:
+      - generic [ref=e340]:
+        - heading "✏️ Edit Petugas Apel" [level=3] [ref=e341]:
+          - generic [ref=e342]: ✏️
+          - text: Edit Petugas Apel
+        - button "Tutup modal" [ref=e343] [cursor=pointer]:
+          - img [ref=e344]
+      - generic [ref=e346]:
+        - paragraph [ref=e347]:
+          - strong [ref=e348]: "Tanggal:"
+          - text: Senin, 26 Januari 2026
+        - paragraph [ref=e349]:
+          - strong [ref=e350]: "Jenis:"
+          - text: Senin
+      - generic [ref=e351]:
+        - generic [ref=e352]:
+          - generic [ref=e353]:
+            - generic [ref=e354]: 👔
+            - generic [ref=e355]: Pembina Apel
+          - combobox "Pilih petugas untuk Pembina Apel" [ref=e356]:
+            - option "-- Pilih Petugas --"
+            - option "FATTAHURRIDLO AL GHANY, S.H.I., M.S.I." [selected]
+            - option "NAHDIYANTI, S.H.I., M.H."
+            - option "NUR RIZKA FANI, S.H."
+            - option "VIDYA NURCHALIZA, S.H."
+            - option "MUHAMMAD HAMDI, S.H., M.Hum."
+            - option "INDRA YANITA YULIANA, S.E., M.Si."
+        - generic [ref=e357]:
+          - generic [ref=e358]:
+            - generic [ref=e359]: 🤲
+            - generic [ref=e360]: Pembaca Doa
+          - combobox "Pilih petugas untuk Pembaca Doa" [ref=e361]:
+            - option "-- Pilih Petugas --" [selected]
+            - option "AWALUDDIN NUR, S.H.I."
+            - option "MUHAMMAD ZAIM NOOR, S.H."
+            - option "MUHAMMAD MIFTAHUDIN, S.H."
+            - option "MUHAMMAD ILHAM, S.H., M.Kn."
+            - option "QURROTU AINI, S.H."
+            - option "MUHARDIANSYAH, S.Kom."
+            - option "YULINDA, A.Md.Kom."
+            - option "IRWAN SYAH SETIAWAN, A.md"
+            - option "JAKFAR, A.Md.A.B."
+        - generic [ref=e362]:
+          - generic [ref=e363]:
+            - generic [ref=e364]: 📖
+            - generic [ref=e365]: Pembaca 8 Nilai MA
+          - combobox "Pilih petugas untuk Pembaca 8 Nilai MA" [ref=e366]:
+            - option "-- Pilih Petugas --"
+            - option "NUZULA YUSTISIA, S.H.I."
+            - option "FARIDAH FITRIYANI, S.H.I."
+            - option "RAINI MAULIDINA, S.H."
+            - option "CUCU KHOFIFAH, S.H." [selected]
+            - option "RAINA PUTRI NASUHA, S.H."
+            - option "NURUL FITRIANI, A.Md.Kom."
+        - generic [ref=e367]:
+          - generic [ref=e368]:
+            - generic [ref=e369]: 🎤
+            - generic [ref=e370]: MC
+          - combobox "Pilih petugas untuk MC" [ref=e371]:
+            - option "-- Pilih Petugas --"
+            - option "NUR MUFLIHAH P.W., S.T."
+            - option "NURAVITA PRAMESTI, A.Md."
+            - option "NOVAYANTI, S.H." [selected]
+            - option "NAJWA HIJRIANA, S.E."
+        - generic [ref=e372]:
+          - generic [ref=e373]:
+            - generic [ref=e374]: ⭐
+            - generic [ref=e375]: Pemimpin Apel
+          - combobox "Pilih petugas untuk Pemimpin Apel" [ref=e376]:
+            - option "-- Pilih Petugas --"
+            - option "DAMAI AZIZU, S.Kom."
+            - option "ASHAR, S.H."
+            - option "AMIN NUR" [selected]
+            - option "ADI IRAWAN"
+        - generic [ref=e377]:
+          - generic [ref=e378]:
+            - generic [ref=e379]: 📋
+            - generic [ref=e380]: Pembaca Lainnya
+          - combobox "Pilih petugas untuk Pembaca Lainnya" [ref=e381]:
+            - option "-- Pilih Petugas --"
+            - option "MUHAMMAD ILHAM, S.H., M.Kn."
+            - option "QURROTU AINI, S.H."
+            - option "CUCU KHOFIFAH, S.H."
+            - option "RAINA PUTRI NASUHA, S.H."
+            - option "NUR MUFLIHAH P.W., S.T." [selected]
+            - option "YULINDA, A.Md.Kom."
+            - option "NURAVITA PRAMESTI, A.Md."
+            - option "IRWAN SYAH SETIAWAN, A.md"
+            - option "JAKFAR, A.Md.A.B."
+      - generic [ref=e382]:
+        - button "Batal" [ref=e383] [cursor=pointer]
+        - button "💾 Simpan" [ref=e384] [cursor=pointer]:
+          - generic [ref=e385]: 💾
+          - text: Simpan
+```

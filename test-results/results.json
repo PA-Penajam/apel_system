@@ -1,0 +1,344 @@
+{
+  "config": {
+    "configFile": "/Volumes/Home/moohard/Kerjaan-Kepegawaian/apel-app/playwright.config.ts",
+    "rootDir": "/Volumes/Home/moohard/Kerjaan-Kepegawaian/apel-app/tests/e2e",
+    "forbidOnly": false,
+    "fullyParallel": true,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 4
+    },
+    "preserveOutput": "always",
+    "reporter": [
+      [
+        "html",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "test-results/results.json"
+        }
+      ],
+      [
+        "junit",
+        {
+          "outputFile": "test-results/results.xml"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "quiet": false,
+    "projects": [
+      {
+        "outputDir": "/Volumes/Home/moohard/Kerjaan-Kepegawaian/apel-app/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 4
+        },
+        "id": "chromium",
+        "name": "chromium",
+        "testDir": "/Volumes/Home/moohard/Kerjaan-Kepegawaian/apel-app/tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 120000
+      }
+    ],
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.57.0",
+    "workers": 5,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "schedule-editing.spec.ts",
+      "file": "schedule-editing.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Schedule Editing Workflow",
+          "file": "schedule-editing.spec.ts",
+          "line": 3,
+          "column": 6,
+          "specs": [
+            {
+              "title": "can login and edit schedule officers",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "timedOut",
+                      "duration": 121957,
+                      "error": {
+                        "message": "\u001b[31mTest timeout of 120000ms exceeded.\u001b[39m",
+                        "stack": "\u001b[31mTest timeout of 120000ms exceeded.\u001b[39m"
+                      },
+                      "errors": [
+                        {
+                          "message": "\u001b[31mTest timeout of 120000ms exceeded.\u001b[39m"
+                        },
+                        {
+                          "location": {
+                            "file": "/Volumes/Home/moohard/Kerjaan-Kepegawaian/apel-app/tests/e2e/schedule-editing.spec.ts",
+                            "column": 20,
+                            "line": 87
+                          },
+                          "message": "Error: page.click: Test timeout of 120000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('text=Dashboard')\u001b[22m\n\u001b[2m    - locator resolved to 2 elements. Proceeding with the first one: <a href=\"http://localhost:8000/dashboard\" class=\"inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium leading-5 transition duration-150 ease-in-out focus:outline-none border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 focus:border-gray-300 focus:text-gray-700\">Dashboard</a>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - <div class=\"absolute inset-0 bg-gray-500/75\"></div> from <div id=\"headlessui-portal-root\">…</div> subtree intercepts pointer events\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - <div class=\"absolute inset-0 bg-gray-500/75\"></div> from <div id=\"headlessui-portal-root\">…</div> subtree intercepts pointer events\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    212 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m        - element is visible, enabled and stable\u001b[22m\n\u001b[2m        - scrolling into view if needed\u001b[22m\n\u001b[2m        - done scrolling\u001b[22m\n\u001b[2m        - <div class=\"absolute inset-0 bg-gray-500/75\"></div> from <div id=\"headlessui-portal-root\">…</div> subtree intercepts pointer events\u001b[22m\n\u001b[2m      - retrying click action\u001b[22m\n\u001b[2m        - waiting 500ms\u001b[22m\n\n\n\u001b[0m \u001b[90m 85 |\u001b[39m\n \u001b[90m 86 |\u001b[39m         \u001b[90m// Navigate away and back to refresh data\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 87 |\u001b[39m         \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m\"text=Dashboard\"\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                    \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 88 |\u001b[39m         \u001b[36mawait\u001b[39m expect(page)\u001b[33m.\u001b[39mtoHaveURL(\u001b[35m/.*dashboard/\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 89 |\u001b[39m         \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mclick(\u001b[32m\"text=Jadwal Apel\"\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 90 |\u001b[39m         \u001b[36mawait\u001b[39m expect(page)\u001b[33m.\u001b[39mtoHaveURL(\u001b[35m/.*schedules/\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at /Volumes/Home/moohard/Kerjaan-Kepegawaian/apel-app/tests/e2e/schedule-editing.spec.ts:87:20\u001b[22m"
+                        }
+                      ],
+                      "stdout": [
+                        {
+                          "text": "Original assignment: NUR RIZKA FANI, S.H.\n"
+                        },
+                        {
+                          "text": "Original user ID: 4\n"
+                        },
+                        {
+                          "text": "Changed to user ID: 2\n"
+                        },
+                        {
+                          "text": "Modal still visible: \u001b[33mtrue\u001b[39m\n"
+                        },
+                        {
+                          "text": "Modal did not close, but checking if database was updated...\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-12T06:01:05.889Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Volumes/Home/moohard/Kerjaan-Kepegawaian/apel-app/test-results/schedule-editing-Schedule--93099--and-edit-schedule-officers-chromium/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Volumes/Home/moohard/Kerjaan-Kepegawaian/apel-app/test-results/schedule-editing-Schedule--93099--and-edit-schedule-officers-chromium/video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Volumes/Home/moohard/Kerjaan-Kepegawaian/apel-app/test-results/schedule-editing-Schedule--93099--and-edit-schedule-officers-chromium/error-context.md"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "c0424e05957c9f3d16a5-a0933ceb6d72113a492e",
+              "file": "schedule-editing.spec.ts",
+              "line": 14,
+              "column": 5
+            },
+            {
+              "title": "verifies database update via API after editing",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "failed",
+                      "duration": 5543,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m200\u001b[39m\nReceived: \u001b[31m404\u001b[39m",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m200\u001b[39m\nReceived: \u001b[31m404\u001b[39m\n    at /Volumes/Home/moohard/Kerjaan-Kepegawaian/apel-app/tests/e2e/schedule-editing.spec.ts:146:35",
+                        "location": {
+                          "file": "/Volumes/Home/moohard/Kerjaan-Kepegawaian/apel-app/tests/e2e/schedule-editing.spec.ts",
+                          "column": 35,
+                          "line": 146
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 144 |\u001b[39m             \u001b[32m`http://localhost:8000/api/schedules/${scheduleId}`\u001b[39m\u001b[33m,\u001b[39m\n \u001b[90m 145 |\u001b[39m         )\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 146 |\u001b[39m         expect(response\u001b[33m.\u001b[39mstatus())\u001b[33m.\u001b[39mtoBe(\u001b[35m200\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                                   \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 147 |\u001b[39m\n \u001b[90m 148 |\u001b[39m         \u001b[90m// The database update verification test shows the database IS being updated\u001b[39m\n \u001b[90m 149 |\u001b[39m         console\u001b[33m.\u001b[39mlog(\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Volumes/Home/moohard/Kerjaan-Kepegawaian/apel-app/tests/e2e/schedule-editing.spec.ts",
+                            "column": 35,
+                            "line": 146
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m200\u001b[39m\nReceived: \u001b[31m404\u001b[39m\n\n\u001b[0m \u001b[90m 144 |\u001b[39m             \u001b[32m`http://localhost:8000/api/schedules/${scheduleId}`\u001b[39m\u001b[33m,\u001b[39m\n \u001b[90m 145 |\u001b[39m         )\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 146 |\u001b[39m         expect(response\u001b[33m.\u001b[39mstatus())\u001b[33m.\u001b[39mtoBe(\u001b[35m200\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                                   \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 147 |\u001b[39m\n \u001b[90m 148 |\u001b[39m         \u001b[90m// The database update verification test shows the database IS being updated\u001b[39m\n \u001b[90m 149 |\u001b[39m         console\u001b[33m.\u001b[39mlog(\u001b[0m\n\u001b[2m    at /Volumes/Home/moohard/Kerjaan-Kepegawaian/apel-app/tests/e2e/schedule-editing.spec.ts:146:35\u001b[22m"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-12T06:01:05.910Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Volumes/Home/moohard/Kerjaan-Kepegawaian/apel-app/test-results/schedule-editing-Schedule--c2b75-pdate-via-API-after-editing-chromium/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Volumes/Home/moohard/Kerjaan-Kepegawaian/apel-app/test-results/schedule-editing-Schedule--c2b75-pdate-via-API-after-editing-chromium/video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Volumes/Home/moohard/Kerjaan-Kepegawaian/apel-app/test-results/schedule-editing-Schedule--c2b75-pdate-via-API-after-editing-chromium/error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Volumes/Home/moohard/Kerjaan-Kepegawaian/apel-app/tests/e2e/schedule-editing.spec.ts",
+                        "column": 35,
+                        "line": 146
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "c0424e05957c9f3d16a5-b6fba95483948247bf8b",
+              "file": "schedule-editing.spec.ts",
+              "line": 100,
+              "column": 5
+            }
+          ]
+        },
+        {
+          "title": "Dashboard Schedule Detail Modal",
+          "file": "schedule-editing.spec.ts",
+          "line": 155,
+          "column": 6,
+          "specs": [
+            {
+              "title": "can view schedule details from dashboard",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 2667,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-12T06:01:05.914Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c0424e05957c9f3d16a5-a02f71bb62596640fe72",
+              "file": "schedule-editing.spec.ts",
+              "line": 166,
+              "column": 5
+            }
+          ]
+        },
+        {
+          "title": "Database Verification",
+          "file": "schedule-editing.spec.ts",
+          "line": 199,
+          "column": 6,
+          "specs": [
+            {
+              "title": "verifies assignment was updated in database",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 3,
+                      "status": "passed",
+                      "duration": 7764,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "Changed user from 4 to 2\n"
+                        },
+                        {
+                          "text": "Database update verified: The updatePetugas method in ScheduleController.php\n"
+                        },
+                        {
+                          "text": "correctly updates the assignments in the database!\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-12T06:01:05.902Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c0424e05957c9f3d16a5-64b0b8e59c3b81765e34",
+              "file": "schedule-editing.spec.ts",
+              "line": 200,
+              "column": 5
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-01-12T06:01:05.393Z",
+    "duration": 122720.009,
+    "expected": 2,
+    "skipped": 0,
+    "unexpected": 2,
+    "flaky": 0
+  }
+}
