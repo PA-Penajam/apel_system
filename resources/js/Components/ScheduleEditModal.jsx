@@ -1,5 +1,5 @@
 import Modal from "@/Components/Modal";
-import { useForm } from "@inertiajs/react";
+import { useForm, router } from "@inertiajs/react";
 import { useState, useEffect } from "react";
 
 export default function ScheduleEditModal({ show, onClose, schedule, users }) {
@@ -44,6 +44,8 @@ export default function ScheduleEditModal({ show, onClose, schedule, users }) {
                 onSuccess: () => {
                     onClose();
                     reset();
+                    // Force page reload to show updated data
+                    router.reload();
                 },
             },
         );
