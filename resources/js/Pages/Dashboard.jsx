@@ -1,19 +1,19 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, Link, router } from "@inertiajs/react";
 import { useState } from "react";
-import SchedulePreviewModal from "@/Components/SchedulePreviewModal";
+import Modal from "@/Components/Modal";
 
 export default function Dashboard({
     auth,
     stats,
     upcomingSchedules,
-    allUpcomingSchedules,
     recentSchedules,
     failedNotifications,
     failedCount,
 }) {
     const [broadcastingId, setBroadcastingId] = useState(null);
-    const [showPreviewModal, setShowPreviewModal] = useState(false);
+    const [selectedSchedule, setSelectedSchedule] = useState(null);
+    const [showDetailModal, setShowDetailModal] = useState(false);
     const [resetting, setResetting] = useState(false);
 
     const handleRetryNotification = (scheduleId) => {
@@ -50,6 +50,35 @@ export default function Dashboard({
                 },
             );
         }
+    };
+
+    const handleViewDetail = (schedule) => {
+        setSelectedSchedule(schedule);
+        setShowDetailModal(true);
+    };
+
+    const getRoleIcon = (role) => {
+        const icons = {
+            "Pembina Apel": "👔",
+            "Pembaca Doa": "🤲",
+            "Pembaca 8 Nilai MA": "📖",
+            MC: "🎤",
+            "Pemimpin Apel": "⭐",
+            "Pembaca Lainnya": "📋",
+        };
+        return icons[role] || "📌";
+    };
+
+    const getRoleColor = (role) => {
+        const colors = {
+            "Pembina Apel": "bg-purple-100 border-purple-200 text-purple-800",
+            "Pembaca Doa": "bg-green-100 border-green-200 text-green-800",
+            "Pembaca 8 Nilai MA": "bg-pink-100 border-pink-200 text-pink-800",
+            MC: "bg-yellow-100 border-yellow-200 text-yellow-800",
+            "Pemimpin Apel": "bg-blue-100 border-blue-200 text-blue-800",
+            "Pembaca Lainnya": "bg-gray-100 border-gray-200 text-gray-800",
+        };
+        return colors[role] || "bg-gray-100 border-gray-200 text-gray-800";
     };
 
     return (
@@ -292,18 +321,6 @@ export default function Dashboard({
                                     <span className="mr-2">📅</span>
                                     Kelola Jadwal Apel
                                 </Link>
-                                {allUpcomingSchedules &&
-                                    allUpcomingSchedules.length > 0 && (
-                                        <button
-                                            onClick={() =>
-                                                setShowPreviewModal(true)
-                                            }
-                                            className="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
-                                        >
-                                            <span className="mr-2">🔍</span>
-                                            Lihat Semua Jadwal
-                                        </button>
-                                    )}
                                 {stats.total_schedules > 0 && (
                                     <button
                                         onClick={handleResetSchedules}
@@ -368,50 +385,72 @@ export default function Dashboard({
                                     </p>
                                 </div>
                             ) : (
-                                <div className="space-y-3">
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                     {upcomingSchedules.map((schedule) => (
                                         <div
                                             key={schedule.id}
-                                            className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
+                                            onClick={() =>
+                                                handleViewDetail(schedule)
+                                            }
+                                            className="cursor-pointer p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-all border border-gray-200 hover:border-blue-300 hover:shadow-md"
                                         >
-                                            <div className="flex items-center gap-4">
-                                                <div
-                                                    className={`w-12 h-12 rounded-full flex items-center justify-center text-white font-bold ${
-                                                        schedule.type ===
+                                            <div className="flex items-center justify-between mb-3">
+                                                <div className="flex items-center gap-3">
+                                                    <div
+                                                        className={`w-12 h-12 rounded-full flex items-center justify-center text-white font-bold ${
+                                                            schedule.type ===
+                                                            "senin"
+                                                                ? "bg-blue-500"
+                                                                : "bg-green-500"
+                                                        }`}
+                                                    >
+                                                        {schedule.type ===
                                                         "senin"
-                                                            ? "bg-blue-500"
-                                                            : "bg-green-500"
-                                                    }`}
-                                                >
-                                                    {schedule.type === "senin"
-                                                        ? "1"
-                                                        : "6"}
+                                                            ? "1"
+                                                            : "6"}
+                                                    </div>
+                                                    <div>
+                                                        <p className="font-medium text-gray-900">
+                                                            {schedule.day_name},{" "}
+                                                            {new Date(
+                                                                schedule.date,
+                                                            ).toLocaleDateString(
+                                                                "id-ID",
+                                                                {
+                                                                    day: "numeric",
+                                                                    month: "short",
+                                                                },
+                                                            )}
+                                                        </p>
+                                                        <p className="text-sm text-gray-500 capitalize">
+                                                            Apel {schedule.type}
+                                                        </p>
+                                                    </div>
                                                 </div>
-                                                <div>
-                                                    <p className="font-medium text-gray-900">
-                                                        {schedule.day_name},{" "}
-                                                        {new Date(
-                                                            schedule.date,
-                                                        ).toLocaleDateString(
-                                                            "id-ID",
-                                                            {
-                                                                day: "numeric",
-                                                                month: "long",
-                                                                year: "numeric",
-                                                            },
-                                                        )}
-                                                    </p>
-                                                    <p className="text-sm text-gray-500 capitalize">
-                                                        Apel {schedule.type}
-                                                    </p>
-                                                </div>
+                                                <span className="text-gray-400">
+                                                    <svg
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                        className="h-5 w-5"
+                                                        fill="none"
+                                                        viewBox="0 0 24 24"
+                                                        stroke="currentColor"
+                                                    >
+                                                        <path
+                                                            strokeLinecap="round"
+                                                            strokeLinejoin="round"
+                                                            strokeWidth={2}
+                                                            d="M9 5l7 7-7 7"
+                                                        />
+                                                    </svg>
+                                                </span>
                                             </div>
-                                            <div className="text-right">
-                                                <p className="text-sm font-medium text-gray-900">
-                                                    {schedule.assignments_count}{" "}
-                                                    penugasan
-                                                </p>
-                                            </div>
+                                            <p className="text-sm text-gray-600 text-center">
+                                                {schedule.assignments_count}{" "}
+                                                penugasan -{" "}
+                                                <span className="text-blue-600 font-medium">
+                                                    Klik untuk detail
+                                                </span>
+                                            </p>
                                         </div>
                                     ))}
                                 </div>
@@ -482,12 +521,118 @@ export default function Dashboard({
                     </div>
                 </div>
 
-                {/* Schedule Preview Modal */}
-                <SchedulePreviewModal
-                    show={showPreviewModal}
-                    onClose={() => setShowPreviewModal(false)}
-                    schedules={allUpcomingSchedules || []}
-                />
+                {/* Schedule Detail Modal */}
+                <Modal
+                    show={showDetailModal}
+                    onClose={() => setShowDetailModal(false)}
+                    maxWidth="lg"
+                    closeable
+                >
+                    {selectedSchedule && (
+                        <div className="p-6">
+                            <div className="flex items-center justify-between mb-6">
+                                <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+                                    <span>📋</span>
+                                    Detail Jadwal Apel
+                                </h3>
+                                <button
+                                    onClick={() => setShowDetailModal(false)}
+                                    className="text-gray-400 hover:text-gray-600 transition-colors"
+                                >
+                                    <svg
+                                        className="w-6 h-6"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke="currentColor"
+                                    >
+                                        <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth={2}
+                                            d="M6 18L18 6M6 6l12 12"
+                                        />
+                                    </svg>
+                                </button>
+                            </div>
+
+                            {/* Header */}
+                            <div className="flex items-center gap-4 mb-6 p-4 bg-gray-50 rounded-lg">
+                                <div
+                                    className={`w-16 h-16 rounded-full flex items-center justify-center text-white font-bold text-xl ${
+                                        selectedSchedule.type === "senin"
+                                            ? "bg-blue-500"
+                                            : "bg-green-500"
+                                    }`}
+                                >
+                                    {selectedSchedule.type === "senin"
+                                        ? "1"
+                                        : "6"}
+                                </div>
+                                <div>
+                                    <p className="text-xl font-bold text-gray-900">
+                                        {selectedSchedule.day_name},{" "}
+                                        {new Date(
+                                            selectedSchedule.date,
+                                        ).toLocaleDateString("id-ID", {
+                                            day: "numeric",
+                                            month: "long",
+                                            year: "numeric",
+                                        })}
+                                    </p>
+                                    <p className="text-gray-500 capitalize">
+                                        Apel {selectedSchedule.type} -{" "}
+                                        {selectedSchedule.assignments?.length ||
+                                            0}{" "}
+                                        penugasan
+                                    </p>
+                                </div>
+                            </div>
+
+                            {/* Assignments */}
+                            <div className="space-y-3">
+                                {selectedSchedule.assignments?.map(
+                                    (assignment) => (
+                                        <div
+                                            key={assignment.id}
+                                            className={`flex items-center gap-4 p-4 rounded-lg border ${getRoleColor(
+                                                assignment.role,
+                                            )}`}
+                                        >
+                                            <span className="text-2xl">
+                                                {getRoleIcon(assignment.role)}
+                                            </span>
+                                            <div className="flex-1">
+                                                <p className="text-sm font-medium opacity-75">
+                                                    {assignment.role}
+                                                </p>
+                                                <p className="font-semibold text-gray-900">
+                                                    {assignment.user?.name ||
+                                                        "-"}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    ),
+                                )}
+                            </div>
+
+                            {/* Actions */}
+                            <div className="mt-6 flex justify-end gap-3">
+                                <Link
+                                    href={route("schedules.index")}
+                                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                                >
+                                    Kelola Jadwal
+                                </Link>
+                                <button
+                                    onClick={() => setShowDetailModal(false)}
+                                    className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                                >
+                                    Tutup
+                                </button>
+                            </div>
+                        </div>
+                    )}
+                </Modal>
             </div>
         </AuthenticatedLayout>
     );
