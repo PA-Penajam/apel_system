@@ -50,6 +50,7 @@ export default function ScheduleEditModal({ show, onClose, schedule, users }) {
             "Pembaca Doa": { jenis_pegawai: ["PNS", "CPNS"], gender: "L" },
             "Pembaca 8 Nilai MA": {
                 jenis_pegawai: "PNS",
+                jenis_jabatan: "!pimpinan",
                 gender: "P",
             },
             MC: {
@@ -69,12 +70,20 @@ export default function ScheduleEditModal({ show, onClose, schedule, users }) {
     const getFilteredUsers = (role) => {
         const criteria = getRoleCriteria(role);
         return users.filter((user) => {
-            // Check jenis_jabatan
-            if (
-                criteria.jenis_jabatan &&
-                user.jenis_jabatan !== criteria.jenis_jabatan
-            ) {
-                return false;
+            // Check jenis_jabatan (bisa positif atau negatif dengan !)
+            if (criteria.jenis_jabatan) {
+                if (criteria.jenis_jabatan.startsWith("!")) {
+                    // Negation: harus TIDAK sama dengan
+                    const excluded = criteria.jenis_jabatan.substring(1);
+                    if (user.jenis_jabatan === excluded) {
+                        return false;
+                    }
+                } else {
+                    // Positive: harus sama dengan
+                    if (user.jenis_jabatan !== criteria.jenis_jabatan) {
+                        return false;
+                    }
+                }
             }
             // Check jenis_pegawai (bisa string atau array)
             if (criteria.jenis_pegawai) {
