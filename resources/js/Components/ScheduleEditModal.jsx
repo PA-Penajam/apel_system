@@ -34,13 +34,19 @@ export default function ScheduleEditModal({ show, onClose, schedule, users }) {
     };
 
     const handleSave = () => {
-        setData("assignments", localAssignments);
-        put(route("schedules.petugas.update", schedule.id), {
-            onSuccess: () => {
-                onClose();
-                reset();
+        // Send data directly instead of relying on useForm state
+        put(
+            route("schedules.petugas.update", schedule.id),
+            {
+                assignments: localAssignments,
             },
-        });
+            {
+                onSuccess: () => {
+                    onClose();
+                    reset();
+                },
+            },
+        );
     };
 
     const getRoleCriteria = (role) => {
