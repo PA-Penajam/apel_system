@@ -68,7 +68,7 @@ class SchedulerService
                 $query->whereIn('jenis_pegawai', ['PNS', 'CPNS'])->where('gender', 'L');
             },
             'Pembaca 8 Nilai MA' => function ($query) {
-                $query->where('jenis_pegawai', 'PNS')->where('jenis_jabatan', 'Staff')->where('gender', 'P');
+                $query->where('jenis_pegawai', 'PNS')->where('gender', 'P');
             },
             'MC' => function ($query) {
                 $query->whereIn('jenis_pegawai', ['CPNS', 'PPPK'])->where('jenis_jabatan', 'Staff')->where('gender', 'P');

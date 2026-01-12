@@ -50,7 +50,6 @@ export default function ScheduleEditModal({ show, onClose, schedule, users }) {
             "Pembaca Doa": { jenis_pegawai: ["PNS", "CPNS"], gender: "L" },
             "Pembaca 8 Nilai MA": {
                 jenis_pegawai: "PNS",
-                jenis_jabatan: "Staff",
                 gender: "P",
             },
             MC: {
