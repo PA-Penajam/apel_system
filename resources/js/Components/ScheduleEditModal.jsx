@@ -60,7 +60,7 @@ export default function ScheduleEditModal({ show, onClose, schedule, users }) {
             },
             "Pemimpin Apel": { jenis_pegawai: "PPPK", gender: "L" },
             "Pembaca Lainnya": {
-                jenis_pegawai: "CPNS",
+                jenis_pegawai: ["PNS", "CPNS"],
                 jenis_jabatan: "Staff",
             },
         };

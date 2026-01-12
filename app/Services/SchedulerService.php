@@ -77,7 +77,7 @@ class SchedulerService
                 $query->where('jenis_pegawai', 'PPPK')->where('gender', 'L');
             },
             'Pembaca Lainnya' => function ($query) {
-                $query->where('jenis_pegawai', 'CPNS')->where('jenis_jabatan', 'Staff');
+                $query->whereIn('jenis_pegawai', ['PNS', 'CPNS'])->where('jenis_jabatan', 'Staff');
             },
         ];
 
