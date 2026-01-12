@@ -70,32 +70,42 @@ export default function ScheduleEditModal({ show, onClose, schedule, users }) {
     const getFilteredUsers = (role) => {
         const criteria = getRoleCriteria(role);
         return users.filter((user) => {
-            // Check jenis_jabatan (bisa positif atau negatif dengan !)
+            // Check jenis_jabatan (case-insensitive)
             if (criteria.jenis_jabatan) {
                 if (criteria.jenis_jabatan.startsWith("!")) {
                     // Negation: harus TIDAK sama dengan
-                    const excluded = criteria.jenis_jabatan.substring(1);
-                    if (user.jenis_jabatan === excluded) {
+                    const excluded = criteria.jenis_jabatan
+                        .substring(1)
+                        .toLowerCase();
+                    if (user.jenis_jabatan?.toLowerCase() === excluded) {
                         return false;
                     }
                 } else {
                     // Positive: harus sama dengan
-                    if (user.jenis_jabatan !== criteria.jenis_jabatan) {
+                    if (
+                        user.jenis_jabatan?.toLowerCase() !==
+                        criteria.jenis_jabatan.toLowerCase()
+                    ) {
                         return false;
                     }
                 }
             }
-            // Check jenis_pegawai (bisa string atau array)
+            // Check jenis_pegawai (case-insensitive)
             if (criteria.jenis_pegawai) {
                 const allowed = Array.isArray(criteria.jenis_pegawai)
                     ? criteria.jenis_pegawai
                     : [criteria.jenis_pegawai];
-                if (!allowed.includes(user.jenis_pegawai)) {
+                const userJenis = user.jenis_pegawai?.toUpperCase();
+                const allowedUpper = allowed.map((j) => j.toUpperCase());
+                if (!allowedUpper.includes(userJenis)) {
                     return false;
                 }
             }
-            // Check gender
-            if (criteria.gender && user.gender !== criteria.gender) {
+            // Check gender (case-insensitive)
+            if (
+                criteria.gender &&
+                user.gender?.toLowerCase() !== criteria.gender.toLowerCase()
+            ) {
                 return false;
             }
             return true;
