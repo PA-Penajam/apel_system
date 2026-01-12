@@ -42,6 +42,34 @@ Route::get('/dashboard', function () {
                 'type' => $schedule->type,
                 'assignments_count' => $schedule->assignments->count(),
                 'day_name' => Carbon::parse($schedule->date)->locale('id')->dayName,
+                'assignments' => $schedule->assignments->map(function ($a) {
+                    return [
+                        'id' => $a->id,
+                        'role' => $a->role,
+                        'user' => $a->user ? ['name' => $a->user->name, 'id' => $a->user->id] : null,
+                    ];
+                }),
+            ];
+        });
+
+    // All upcoming schedules for modal (without limit)
+    $allUpcomingSchedules = Schedule::with('assignments.user')
+        ->where('date', '>=', $today)
+        ->orderBy('date')
+        ->get()
+        ->map(function ($schedule) {
+            return [
+                'id' => $schedule->id,
+                'date' => $schedule->date,
+                'type' => $schedule->type,
+                'day_name' => Carbon::parse($schedule->date)->locale('id')->dayName,
+                'assignments' => $schedule->assignments->map(function ($a) {
+                    return [
+                        'id' => $a->id,
+                        'role' => $a->role,
+                        'user' => $a->user ? ['name' => $a->user->name, 'id' => $a->user->id] : null,
+                    ];
+                }),
             ];
         });
 
@@ -87,11 +115,22 @@ Route::get('/dashboard', function () {
     return Inertia::render('Dashboard', [
         'stats' => $stats,
         'upcomingSchedules' => $upcomingSchedules,
+        'allUpcomingSchedules' => $allUpcomingSchedules,
         'recentSchedules' => $recentSchedules,
         'failedNotifications' => $failedNotifications,
         'failedCount' => $failedCount,
     ]);
 })->middleware(['auth', 'verified'])->name('dashboard');
+
+// Reset all schedules route
+Route::post('/schedules/reset', function () {
+    Schedule::with('assignments')->get()->each(function ($schedule) {
+        $schedule->assignments()->delete();
+        $schedule->delete();
+    });
+
+    return redirect()->back()->with('success', 'Semua jadwal berhasil dihapus.');
+})->middleware(['auth', 'verified'])->name('schedules.reset');
 
 Route::middleware('auth')->group(function () {
     // Profile routes

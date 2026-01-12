@@ -1,16 +1,20 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, Link, router } from "@inertiajs/react";
 import { useState } from "react";
+import SchedulePreviewModal from "@/Components/SchedulePreviewModal";
 
 export default function Dashboard({
     auth,
     stats,
     upcomingSchedules,
+    allUpcomingSchedules,
     recentSchedules,
     failedNotifications,
     failedCount,
 }) {
     const [broadcastingId, setBroadcastingId] = useState(null);
+    const [showPreviewModal, setShowPreviewModal] = useState(false);
+    const [resetting, setResetting] = useState(false);
 
     const handleRetryNotification = (scheduleId) => {
         if (confirm("Coba kirim notifikasi ulang untuk jadwal ini?")) {
@@ -21,6 +25,26 @@ export default function Dashboard({
                 {
                     onFinish: () => {
                         setBroadcastingId(null);
+                        router.reload();
+                    },
+                },
+            );
+        }
+    };
+
+    const handleResetSchedules = () => {
+        if (
+            confirm(
+                "Apakah Anda yakin ingin menghapus SEMUA jadwal? Tindakan ini tidak dapat dibatalkan!",
+            )
+        ) {
+            setResetting(true);
+            router.post(
+                route("schedules.reset"),
+                {},
+                {
+                    onFinish: () => {
+                        setResetting(false);
                         router.reload();
                     },
                 },
@@ -268,6 +292,55 @@ export default function Dashboard({
                                     <span className="mr-2">📅</span>
                                     Kelola Jadwal Apel
                                 </Link>
+                                {allUpcomingSchedules &&
+                                    allUpcomingSchedules.length > 0 && (
+                                        <button
+                                            onClick={() =>
+                                                setShowPreviewModal(true)
+                                            }
+                                            className="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+                                        >
+                                            <span className="mr-2">🔍</span>
+                                            Lihat Semua Jadwal
+                                        </button>
+                                    )}
+                                {stats.total_schedules > 0 && (
+                                    <button
+                                        onClick={handleResetSchedules}
+                                        disabled={resetting}
+                                        className="inline-flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50"
+                                    >
+                                        {resetting ? (
+                                            <>
+                                                <svg
+                                                    className="animate-spin h-4 w-4 mr-2"
+                                                    viewBox="0 0 24 24"
+                                                >
+                                                    <circle
+                                                        className="opacity-25"
+                                                        cx="12"
+                                                        cy="12"
+                                                        r="10"
+                                                        stroke="currentColor"
+                                                        strokeWidth="4"
+                                                        fill="none"
+                                                    />
+                                                    <path
+                                                        className="opacity-75"
+                                                        fill="currentColor"
+                                                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                                                    />
+                                                </svg>
+                                                Menghapus...
+                                            </>
+                                        ) : (
+                                            <>
+                                                <span className="mr-2">🗑️</span>
+                                                Reset Jadwal
+                                            </>
+                                        )}
+                                    </button>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -408,6 +481,13 @@ export default function Dashboard({
                         </div>
                     </div>
                 </div>
+
+                {/* Schedule Preview Modal */}
+                <SchedulePreviewModal
+                    show={showPreviewModal}
+                    onClose={() => setShowPreviewModal(false)}
+                    schedules={allUpcomingSchedules || []}
+                />
             </div>
         </AuthenticatedLayout>
     );
