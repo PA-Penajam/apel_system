@@ -1,13 +1,11 @@
 import Modal from "@/Components/Modal";
 import { useForm, router } from "@inertiajs/react";
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 
 export default function ScheduleEditModal({ show, onClose, schedule, users }) {
     const { data, setData, put, processing, errors, reset } = useForm({
         assignments: [],
     });
-
-    const [localAssignments, setLocalAssignments] = useState([]);
 
     useEffect(() => {
         if (show && schedule) {
@@ -18,37 +16,30 @@ export default function ScheduleEditModal({ show, onClose, schedule, users }) {
                     user_id: assignment.user?.id || "",
                 }),
             );
-            setLocalAssignments(initialAssignments);
             setData("assignments", initialAssignments);
         }
     }, [show, schedule]);
 
     const handleUserChange = (assignmentId, userId) => {
-        setLocalAssignments((prev) =>
-            prev.map((assignment) =>
+        setData((current) => ({
+            ...current,
+            assignments: current.assignments.map((assignment) =>
                 assignment.id === assignmentId
                     ? { ...assignment, user_id: userId }
                     : assignment,
             ),
-        );
+        }));
     };
 
     const handleSave = () => {
-        // Send data directly instead of relying on useForm state
-        put(
-            route("schedules.petugas.update", schedule.id),
-            {
-                assignments: localAssignments,
+        put(route("schedules.petugas.update", schedule.id), {
+            onSuccess: () => {
+                onClose();
+                reset();
+                // Force page reload to show updated data
+                router.reload();
             },
-            {
-                onSuccess: () => {
-                    onClose();
-                    reset();
-                    // Force page reload to show updated data
-                    router.reload();
-                },
-            },
-        );
+        });
     };
 
     const getRoleCriteria = (role) => {
@@ -244,7 +235,7 @@ export default function ScheduleEditModal({ show, onClose, schedule, users }) {
                 </div>
 
                 <div className="space-y-4 max-h-96 overflow-y-auto">
-                    {localAssignments.map((assignment) => {
+                    {data.assignments.map((assignment, index) => {
                         const filteredUsers = getFilteredUsers(assignment.role);
                         return (
                             <div
@@ -286,15 +277,9 @@ export default function ScheduleEditModal({ show, onClose, schedule, users }) {
                                         role ini
                                     </p>
                                 )}
-                                {errors[
-                                    `assignments.${assignment.id}.user_id`
-                                ] && (
+                                {errors[`assignments.${index}.user_id`] && (
                                     <p className="mt-1 text-sm text-red-600">
-                                        {
-                                            errors[
-                                                `assignments.${assignment.id}.user_id`
-                                            ]
-                                        }
+                                        {errors[`assignments.${index}.user_id`]}
                                     </p>
                                 )}
                             </div>
