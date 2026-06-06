@@ -2,6 +2,7 @@ import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, useForm, router } from "@inertiajs/react";
 import { useState } from "react";
 import ScheduleEditModal from "@/Components/ScheduleEditModal";
+import ConfirmDialog from "@/Components/ConfirmDialog";
 import { getRoleIcon, getRoleColor } from "@/utils/roles";
 
 export default function Index({ schedules, auth, users }) {
@@ -16,6 +17,7 @@ export default function Index({ schedules, auth, users }) {
     const [checkingFonnte, setCheckingFonnte] = useState(false);
     const [editingSchedule, setEditingSchedule] = useState(null);
     const [showEditModal, setShowEditModal] = useState(false);
+    const [confirmAction, setConfirmAction] = useState(null);
 
     const handleGenerate = (e) => {
         e.preventDefault();
@@ -23,33 +25,48 @@ export default function Index({ schedules, auth, users }) {
     };
 
     const handleBroadcast = (scheduleId) => {
-        if (confirm("Kirim notifikasi jadwal ke grup WhatsApp?")) {
-            setBroadcastingId(scheduleId);
-            router.post(
-                route("schedules.broadcast"),
-                {
-                    schedule_id: scheduleId,
-                },
-                {
-                    onFinish: () => setBroadcastingId(null),
-                },
-            );
-        }
+        setConfirmAction({ type: "broadcast", scheduleId });
     };
 
     const handleManualSend = (scheduleId) => {
-        if (confirm("Kirim notifikasi manual ke petugas?")) {
-            setBroadcastingId(scheduleId);
-            router.post(
-                route("schedules.broadcast.all"),
-                {
-                    schedule_id: scheduleId,
-                },
-                {
-                    onFinish: () => setBroadcastingId(null),
-                },
-            );
+        setConfirmAction({ type: "manual", scheduleId });
+    };
+
+    const handleConfirmAction = () => {
+        if (!confirmAction) return;
+
+        switch (confirmAction.type) {
+            case "broadcast": {
+                const scheduleId = confirmAction.scheduleId;
+                setBroadcastingId(scheduleId);
+                router.post(
+                    route("schedules.broadcast"),
+                    {
+                        schedule_id: scheduleId,
+                    },
+                    {
+                        onFinish: () => setBroadcastingId(null),
+                    },
+                );
+                break;
+            }
+            case "manual": {
+                const scheduleId = confirmAction.scheduleId;
+                setBroadcastingId(scheduleId);
+                router.post(
+                    route("schedules.broadcast.all"),
+                    {
+                        schedule_id: scheduleId,
+                    },
+                    {
+                        onFinish: () => setBroadcastingId(null),
+                    },
+                );
+                break;
+            }
         }
+
+        setConfirmAction(null);
     };
 
     const handleOpenEditModal = (schedule) => {
@@ -690,6 +707,29 @@ export default function Index({ schedules, auth, users }) {
                     onClose={() => setShowEditModal(false)}
                     schedule={editingSchedule}
                     users={users}
+                />
+
+                {/* Confirm Dialog untuk mengganti window.confirm */}
+                <ConfirmDialog
+                    show={!!confirmAction}
+                    onClose={() => setConfirmAction(null)}
+                    onConfirm={handleConfirmAction}
+                    title={
+                        confirmAction?.type === "broadcast"
+                            ? "Broadcast Notifikasi Grup"
+                            : confirmAction?.type === "manual"
+                              ? "Kirim Notifikasi Manual"
+                              : "Konfirmasi"
+                    }
+                    message={
+                        confirmAction?.type === "broadcast"
+                            ? "Kirim notifikasi jadwal ke grup WhatsApp?"
+                            : confirmAction?.type === "manual"
+                              ? "Kirim notifikasi manual ke petugas?"
+                              : ""
+                    }
+                    confirmText="Ya, Kirim"
+                    isDanger={false}
                 />
             </div>
         </AuthenticatedLayout>

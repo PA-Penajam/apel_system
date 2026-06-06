@@ -2,6 +2,7 @@ import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, Link, router } from "@inertiajs/react";
 import { useState } from "react";
 import Modal from "@/Components/Modal";
+import ConfirmDialog from "@/Components/ConfirmDialog";
 import { getRoleIcon, getRoleColor } from "@/utils/roles";
 
 export default function Dashboard({
@@ -16,41 +17,52 @@ export default function Dashboard({
     const [selectedSchedule, setSelectedSchedule] = useState(null);
     const [showDetailModal, setShowDetailModal] = useState(false);
     const [resetting, setResetting] = useState(false);
+    const [confirmAction, setConfirmAction] = useState(null);
 
     const handleRetryNotification = (scheduleId) => {
-        if (confirm("Coba kirim notifikasi ulang untuk jadwal ini?")) {
-            setBroadcastingId(scheduleId);
-            router.post(
-                route("schedules.force-send"),
-                { schedule_id: scheduleId },
-                {
-                    onFinish: () => {
-                        setBroadcastingId(null);
-                        router.reload();
-                    },
-                },
-            );
-        }
+        setConfirmAction({ type: "retry", scheduleId });
     };
 
     const handleResetSchedules = () => {
-        if (
-            confirm(
-                "Apakah Anda yakin ingin menghapus SEMUA jadwal? Tindakan ini tidak dapat dibatalkan!",
-            )
-        ) {
-            setResetting(true);
-            router.post(
-                route("schedules.reset"),
-                {},
-                {
-                    onFinish: () => {
-                        setResetting(false);
-                        router.reload();
+        setConfirmAction({ type: "reset" });
+    };
+
+    const handleConfirmAction = () => {
+        if (!confirmAction) return;
+
+        switch (confirmAction.type) {
+            case "retry": {
+                const scheduleId = confirmAction.scheduleId;
+                setBroadcastingId(scheduleId);
+                router.post(
+                    route("schedules.force-send"),
+                    { schedule_id: scheduleId },
+                    {
+                        onFinish: () => {
+                            setBroadcastingId(null);
+                            router.reload();
+                        },
                     },
-                },
-            );
+                );
+                break;
+            }
+            case "reset": {
+                setResetting(true);
+                router.post(
+                    route("schedules.reset"),
+                    {},
+                    {
+                        onFinish: () => {
+                            setResetting(false);
+                            router.reload();
+                        },
+                    },
+                );
+                break;
+            }
         }
+
+        setConfirmAction(null);
     };
 
     const handleViewDetail = (schedule) => {
@@ -610,6 +622,29 @@ export default function Dashboard({
                         </div>
                     )}
                 </Modal>
+
+                {/* Confirm Dialog untuk mengganti window.confirm */}
+                <ConfirmDialog
+                    show={!!confirmAction}
+                    onClose={() => setConfirmAction(null)}
+                    onConfirm={handleConfirmAction}
+                    title={
+                        confirmAction?.type === "retry"
+                            ? "Kirim Ulang Notifikasi"
+                            : "Reset Semua Jadwal"
+                    }
+                    message={
+                        confirmAction?.type === "retry"
+                            ? "Coba kirim notifikasi ulang untuk jadwal ini?"
+                            : "Apakah Anda yakin ingin menghapus SEMUA jadwal? Tindakan ini tidak dapat dibatalkan!"
+                    }
+                    confirmText={
+                        confirmAction?.type === "reset"
+                            ? "Ya, Reset Semua"
+                            : "Ya, Kirim Ulang"
+                    }
+                    isDanger={confirmAction?.type === "reset"}
+                />
             </div>
         </AuthenticatedLayout>
     );
