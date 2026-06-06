@@ -187,10 +187,12 @@ export default function ScheduleCard({
                     )}
 
                     {/* Edit Petugas Button - distandarisasi ke primary token */}
+                    {/* aria-label ditambahkan untuk aksesibilitas (icon-only button) */}
                     <button
                         onClick={onEdit}
                         className="p-2 rounded-lg text-sm font-medium bg-primary text-white hover:bg-primary/90 transition-all flex items-center justify-center"
                         title="Edit petugas"
+                        aria-label="Edit petugas jadwal ini"
                     >
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
