@@ -61,7 +61,7 @@ export default function Welcome({ auth }) {
         <>
             <Head title="Welcome" />
             <div className="min-h-screen bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-gray-100">
-                {/* Top Nav - conditional auth links, reuse pattern from old + clean */}
+                {/* Navigasi Atas - link auth kondisional (hanya Masuk/Dashboard berdasarkan auth.user, tanpa expose register) */}
                 <nav className="border-b border-gray-200 bg-white dark:bg-gray-800 dark:border-gray-700">
                     <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
                         <div className="flex items-center gap-3">
@@ -77,26 +77,18 @@ export default function Welcome({ auth }) {
                                     Dashboard
                                 </Link>
                             ) : (
-                                <>
-                                    <Link
-                                        href={route('login')}
-                                        className="rounded-md px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-700 transition"
-                                    >
-                                        Log in
-                                    </Link>
-                                    <Link
-                                        href={route('register')}
-                                        className="rounded-md px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-700 transition ml-1"
-                                    >
-                                        Register
-                                    </Link>
-                                </>
+                                <Link
+                                    href={route('login')}
+                                    className="rounded-md px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-700 transition"
+                                >
+                                    Masuk
+                                </Link>
                             )}
                         </div>
                     </div>
                 </nav>
 
-                {/* Hero Section - name + tagline, blue-indigo gradient from Dashboard pattern */}
+                {/* Hero Section - nama sistem + tagline, gradien biru-indigo mengikuti pola Dashboard */}
                 <div className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white">
                     <div className="max-w-7xl mx-auto px-6 py-16 lg:py-20 text-center">
                         <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-4">
@@ -122,19 +114,11 @@ export default function Welcome({ auth }) {
                                     Masuk ke Sistem
                                 </Link>
                             )}
-                            {!auth.user && (
-                                <Link
-                                    href={route('register')}
-                                    className="inline-flex items-center justify-center px-8 py-3 text-lg font-semibold border-2 border-white/70 text-white rounded-lg hover:bg-white/10 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
-                                >
-                                    Daftar Akun
-                                </Link>
-                            )}
                         </div>
                     </div>
                 </div>
 
-                {/* Penjelasan Singkat - use of PA Penajam + Fonnte */}
+                {/* Penjelasan Singkat - deskripsi PA Penajam + integrasi Fonnte */}
                 <div className="max-w-4xl mx-auto px-6 py-12 text-center">
                     <p className="text-lg text-gray-600 dark:text-gray-300 leading-relaxed">
                         Sistem Penjadwalan Apel PA Penajam dirancang khusus untuk mendukung pelaksanaan apel rutin di lingkungan Pengadilan Agama Penajam.
@@ -161,7 +145,7 @@ export default function Welcome({ auth }) {
                     </div>
                 </div>
 
-                {/* 6 Peran grid - EXACT icons + Tailwind color classes from Dashboard.jsx getRoleIcon/getRoleColor (purple, green, pink, yellow, blue, gray) */}
+                {/* Grid 6 Peran - ikon & warna Tailwind persis mengikuti pola Dashboard.jsx (getRoleIcon/getRoleColor: purple, green, pink, yellow, blue, gray) */}
                 <div className="max-w-7xl mx-auto px-6 py-12">
                     <h2 className="text-3xl font-bold text-center mb-4 text-gray-900 dark:text-white">6 Peran dalam Pelaksanaan Apel</h2>
                     <p className="text-center text-gray-600 dark:text-gray-400 mb-8 max-w-2xl mx-auto">
@@ -180,7 +164,7 @@ export default function Welcome({ auth }) {
                     </div>
                 </div>
 
-                {/* Big CTA "Masuk ke Sistem" - conditional route based on auth, gradient matching Dashboard */}
+                {/* CTA Besar "Masuk ke Sistem" - route kondisional berdasarkan auth, gradien sesuai Dashboard */}
                 <div className="bg-gray-100 dark:bg-gray-800 py-16 border-t border-gray-200 dark:border-gray-700">
                     <div className="max-w-4xl mx-auto px-6 text-center">
                         <h2 className="text-3xl font-bold mb-4 text-gray-900 dark:text-white">Siap Mengelola Apel?</h2>
@@ -205,7 +189,7 @@ export default function Welcome({ auth }) {
                     </div>
                 </div>
 
-                {/* Minimal footer - professional, no Laravel marketing/version */}
+                {/* Footer minimal - profesional, tanpa marketing Laravel/version */}
                 <footer className="py-8 text-center text-sm text-gray-500 dark:text-gray-400 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
                     <div className="max-w-7xl mx-auto px-6">
                         © {new Date().getFullYear()} Pengadilan Agama Penajam. Sistem Penjadwalan Apel.
