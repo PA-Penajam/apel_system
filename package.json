@@ -1,5 +1,7 @@
 {
     "$schema": "https://www.schemastore.org/package.json",
+    "name": "apel-system-pa-penajam",
+    "description": "Sistem Penjadwalan Apel PA Penajam - Frontend Inertia React",
     "private": true,
     "type": "module",
     "scripts": {

@@ -1,11 +1,18 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "laravel/laravel",
+    "name": "pa-penajam/apel-system",
     "type": "project",
-    "description": "The skeleton application for the Laravel framework.",
+    "description": "Sistem Penjadwalan Apel otomatis dengan rotasi petugas dan notifikasi WhatsApp untuk Pengadilan Agama Penajam.",
     "keywords": [
+        "apel",
+        "penjadwalan",
+        "pengadilan-agama",
+        "fonnte",
+        "whatsapp",
+        "rotasi-petugas",
         "laravel",
-        "framework"
+        "inertia",
+        "react"
     ],
     "license": "MIT",
     "require": {
