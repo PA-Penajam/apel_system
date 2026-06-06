@@ -137,7 +137,6 @@ Route::middleware('auth')->group(function () {
     Route::get('/schedules', [ScheduleController::class, 'index'])->name('schedules.index');
     Route::post('/schedules/generate', [ScheduleController::class, 'generate'])->name('schedules.generate');
     Route::delete('/schedules/{schedule}', [ScheduleController::class, 'destroy'])->name('schedules.destroy');
-    Route::get('/schedules/{schedule}', [ScheduleController::class, 'show'])->name('schedules.show');
     Route::post('/schedules/force-send', [ScheduleController::class, 'forceSendManual'])->name('schedules.force-send');
     Route::put('/schedules/{schedule}/petugas', [ScheduleController::class, 'updatePetugas'])->name('schedules.petugas.update');
 

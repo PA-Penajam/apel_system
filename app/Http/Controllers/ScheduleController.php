@@ -270,18 +270,6 @@ class ScheduleController extends Controller
     }
 
     /**
-     * Show single schedule details.
-     */
-    public function show(Schedule $schedule)
-    {
-        $schedule->load('assignments.user');
-
-        return Inertia::render('Schedules/Show', [
-            'schedule' => $schedule,
-        ]);
-    }
-
-    /**
      * Delete a schedule.
      */
     public function destroy(Schedule $schedule)

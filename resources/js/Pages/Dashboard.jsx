@@ -2,6 +2,9 @@ import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, Link, router } from "@inertiajs/react";
 import { useState } from "react";
 import Modal from "@/Components/Modal";
+import ConfirmDialog from "@/Components/ConfirmDialog";
+import PrimaryButton from "@/Components/PrimaryButton";
+import { getRoleIcon, getRoleColor } from "@/utils/roles";
 
 export default function Dashboard({
     auth,
@@ -15,70 +18,57 @@ export default function Dashboard({
     const [selectedSchedule, setSelectedSchedule] = useState(null);
     const [showDetailModal, setShowDetailModal] = useState(false);
     const [resetting, setResetting] = useState(false);
+    const [confirmAction, setConfirmAction] = useState(null);
 
     const handleRetryNotification = (scheduleId) => {
-        if (confirm("Coba kirim notifikasi ulang untuk jadwal ini?")) {
-            setBroadcastingId(scheduleId);
-            router.post(
-                route("schedules.force-send"),
-                { schedule_id: scheduleId },
-                {
-                    onFinish: () => {
-                        setBroadcastingId(null);
-                        router.reload();
-                    },
-                },
-            );
-        }
+        setConfirmAction({ type: "retry", scheduleId });
     };
 
     const handleResetSchedules = () => {
-        if (
-            confirm(
-                "Apakah Anda yakin ingin menghapus SEMUA jadwal? Tindakan ini tidak dapat dibatalkan!",
-            )
-        ) {
-            setResetting(true);
-            router.post(
-                route("schedules.reset"),
-                {},
-                {
-                    onFinish: () => {
-                        setResetting(false);
-                        router.reload();
+        setConfirmAction({ type: "reset" });
+    };
+
+    const handleConfirmAction = () => {
+        if (!confirmAction) return;
+
+        switch (confirmAction.type) {
+            case "retry": {
+                const scheduleId = confirmAction.scheduleId;
+                setBroadcastingId(scheduleId);
+                router.post(
+                    route("schedules.force-send"),
+                    { schedule_id: scheduleId },
+                    {
+                        onFinish: () => {
+                            setBroadcastingId(null);
+                            router.reload();
+                        },
                     },
-                },
-            );
+                );
+                break;
+            }
+            case "reset": {
+                setResetting(true);
+                router.post(
+                    route("schedules.reset"),
+                    {},
+                    {
+                        onFinish: () => {
+                            setResetting(false);
+                            router.reload();
+                        },
+                    },
+                );
+                break;
+            }
         }
+
+        setConfirmAction(null);
     };
 
     const handleViewDetail = (schedule) => {
         setSelectedSchedule(schedule);
         setShowDetailModal(true);
-    };
-
-    const getRoleIcon = (role) => {
-        const icons = {
-            "Pembina Apel": "👔",
-            "Pembaca Doa": "🤲",
-            "Pembaca 8 Nilai MA": "📖",
-            MC: "🎤",
-            "Pemimpin Apel": "⭐",
-            "Pembaca Lainnya": "📋",
-        };
-        return icons[role] || "📌";
-    };
-
-    const getRoleColor = (role) => {
-        const colors = {
-            "Pembina Apel": "bg-purple-100 border-purple-200 text-purple-800",
-            "Pembaca Doa": "bg-green-100 border-green-200 text-green-800",
-            "Pembaca 8 Nilai MA": "bg-pink-100 border-pink-200 text-pink-800",
-            MC: "bg-yellow-100 border-yellow-200 text-yellow-800",
-            "Pemimpin Apel": "bg-blue-100 border-blue-200 text-blue-800",
-            "Pembaca Lainnya": "bg-gray-100 border-gray-200 text-gray-800",
-        };
-        return colors[role] || "bg-gray-100 border-gray-200 text-gray-800";
     };
 
     return (
@@ -94,7 +84,7 @@ export default function Dashboard({
 
             <div className="py-12 bg-gray-50 min-h-screen">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8 space-y-6">
-                    {/* Welcome Section */}
+                    {/* Welcome Section - banner menggunakan gradient brand (blue-indigo) yang akan distandarisasi lebih lanjut via primary token di Fase 3 lanjutan */}
                     <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                         <div className="p-6 bg-gradient-to-r from-blue-600 to-indigo-700 text-white">
                             <h3 className="text-2xl font-bold mb-2">
@@ -257,7 +247,9 @@ export default function Dashboard({
                                                     </p>
                                                 </div>
                                             </div>
-                                            <button
+                                            {/* Tombol menggunakan variant danger dari PrimaryButton (token --danger) */}
+                                            <PrimaryButton
+                                                variant="danger"
                                                 onClick={() =>
                                                     handleRetryNotification(
                                                         schedule.id,
@@ -267,7 +259,7 @@ export default function Dashboard({
                                                     broadcastingId ===
                                                     schedule.id
                                                 }
-                                                className="px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 disabled:opacity-50 flex items-center gap-2 transition-colors"
+                                                className="flex items-center gap-2 text-sm"
                                             >
                                                 {broadcastingId ===
                                                 schedule.id ? (
@@ -299,7 +291,7 @@ export default function Dashboard({
                                                         Coba Lagi
                                                     </>
                                                 )}
-                                            </button>
+                                            </PrimaryButton>
                                         </div>
                                     ))}
                                 </div>
@@ -314,18 +306,19 @@ export default function Dashboard({
                                 ⚡ Aksi Cepat
                             </h3>
                             <div className="flex flex-wrap gap-4">
+                                {/* Contoh penggunaan token semantic: bg-primary (menggantikan blue-600) */}
                                 <Link
                                     href={route("schedules.index")}
-                                    className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                                    className="inline-flex items-center px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
                                 >
                                     <span className="mr-2">📅</span>
                                     Kelola Jadwal Apel
                                 </Link>
                                 {stats.total_schedules > 0 && (
-                                    <button
+                                    <PrimaryButton
+                                        variant="danger"
                                         onClick={handleResetSchedules}
                                         disabled={resetting}
-                                        className="inline-flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50"
                                     >
                                         {resetting ? (
                                             <>
@@ -356,7 +349,7 @@ export default function Dashboard({
                                                 Reset Jadwal
                                             </>
                                         )}
-                                    </button>
+                                    </PrimaryButton>
                                 )}
                             </div>
                         </div>
@@ -617,9 +610,10 @@ export default function Dashboard({
 
                             {/* Actions */}
                             <div className="mt-6 flex justify-end gap-3">
+                                {/* Demonstrasi token primary pada Link di dalam modal */}
                                 <Link
                                     href={route("schedules.index")}
-                                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                                    className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
                                 >
                                     Kelola Jadwal
                                 </Link>
@@ -633,6 +627,29 @@ export default function Dashboard({
                         </div>
                     )}
                 </Modal>
+
+                {/* Confirm Dialog untuk mengganti window.confirm */}
+                <ConfirmDialog
+                    show={!!confirmAction}
+                    onClose={() => setConfirmAction(null)}
+                    onConfirm={handleConfirmAction}
+                    title={
+                        confirmAction?.type === "retry"
+                            ? "Kirim Ulang Notifikasi"
+                            : "Reset Semua Jadwal"
+                    }
+                    message={
+                        confirmAction?.type === "retry"
+                            ? "Coba kirim notifikasi ulang untuk jadwal ini?"
+                            : "Apakah Anda yakin ingin menghapus SEMUA jadwal? Tindakan ini tidak dapat dibatalkan!"
+                    }
+                    confirmText={
+                        confirmAction?.type === "reset"
+                            ? "Ya, Reset Semua"
+                            : "Ya, Kirim Ulang"
+                    }
+                    isDanger={confirmAction?.type === "reset"}
+                />
             </div>
         </AuthenticatedLayout>
     );

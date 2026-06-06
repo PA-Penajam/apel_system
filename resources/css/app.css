@@ -1,3 +1,43 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/*
+ * Design tokens (Fase 3 foundation)
+ * Menggunakan CSS custom properties dengan format HSL channels (tanpa wrapper rgb/hsl)
+ * agar kompatibel dengan Tailwind opacity modifiers (contoh: bg-primary/90, text-primary/80).
+ * Nilai dipilih mendekati blue-600/indigo-700 yang sudah dipakai di hero & CTA agar visual tetap identik.
+ * Hanya token minimal sesuai YAGNI: primary, danger, success, surface + beberapa pendukung.
+ */
+
+@layer base {
+  :root {
+    /* Primary (indigo/blue family untuk hero banner, tombol utama, link CTA) */
+    --primary: 243 75% 59%; /* mendekati indigo-500/600 */
+    --primary-glow: 243 75% 72%; /* varian lebih terang untuk glow/ring */
+
+    /* Danger (untuk tombol destructive seperti Reset, error states) */
+    --danger: 0 84% 60%; /* mendekati red-600 */
+
+    /* Success (untuk status positif, tombol hijau seperti Cek Kuota) */
+    --success: 142 76% 36%; /* mendekati green-600 */
+
+    /* Surface / card (latar belakang kartu & permukaan) */
+    --surface: 0 0% 100%; /* white */
+
+    /* Text utama untuk konteks surface */
+    --text: 222 47% 11%; /* mendekati gray-900 */
+
+    /* Radius tokens (agar rounded-lg/xl konsisten via var jika diperlukan di masa depan) */
+    --radius: 0.5rem;
+    --radius-lg: 0.75rem;
+  }
+}
+
+/* Beberapa utility class minimal (YAGNI — hanya jika membantu konsistensi tanpa menulis ulang banyak) */
+.card {
+  background-color: hsl(var(--surface));
+  border-radius: var(--radius-lg);
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  border: 1px solid #f3f4f6; /* gray-100 */
+}

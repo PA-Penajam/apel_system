@@ -459,6 +459,14 @@ Ini akan menjadi 6-8 step kecil.
 - Konsisten dengan review + Laravel Boost + Inertia docs (dari MCP).
 - Plan ini bisa dieksekusi oleh engineer baru dengan nol konteks.
 
+**Post-Task 1 Spec Compliance Self-Review Update (2026-06-06):**
+- Spec reviewer menemukan 1 deviation di FlashMessages.jsx (extra router import + second useEffect + JSDoc + Bahasa comments yang tidak ada di verbatim snippet Task 1).
+- Tindakan koreksi: edit tepat 1 file (resources/js/Components/FlashMessages.jsx) agar 100% match verbatim code block dari plan (hanya import usePage, 1 useEffect berdasarkan usePage().props.flash, no extra, no comments/JSDoc).
+- Rebuild: npm run build sukses.
+- Amend commit (tanpa ubah message).
+- Sekarang exact match 1:1 dengan snippet plan. Status Task 1: DONE (spec compliant).
+- Hanya file jsx yang diedit untuk fix ini; tidak ada fitur baru.
+
 **Plan lengkap disimpan.** Setelah ini, user akan diminta pilih cara eksekusi.
 
 ---
