@@ -1,5 +1,5 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { Head, useForm, router } from "@inertiajs/react";
+import { Head, Form, router } from "@inertiajs/react";
 import { useState } from "react";
 import ScheduleEditModal from "@/Components/ScheduleEditModal";
 import ConfirmDialog from "@/Components/ConfirmDialog";
@@ -7,11 +7,9 @@ import PrimaryButton from "@/Components/PrimaryButton";
 import { getRoleIcon, getRoleColor } from "@/utils/roles";
 
 export default function Index({ schedules, auth, users }) {
-    const { data, setData, post, processing, errors } = useForm({
-        start_date: "",
-        end_date: "",
-    });
-
+    // useForm hook dihapus untuk generator karena sudah dimigrasikan ke komponen <Form> Inertia v2.
+    // <Form> menangani data, submit, processing, dan errors secara deklaratif via children render prop.
+    // State lain tetap pakai useState seperti semula.
     const [broadcastingId, setBroadcastingId] = useState(null);
     const [fonnteStatus, setFonnteStatus] = useState(null);
     const [quotaStatus, setQuotaStatus] = useState(null);
@@ -20,10 +18,7 @@ export default function Index({ schedules, auth, users }) {
     const [showEditModal, setShowEditModal] = useState(false);
     const [confirmAction, setConfirmAction] = useState(null);
 
-    const handleGenerate = (e) => {
-        e.preventDefault();
-        post(route("schedules.generate"));
-    };
+    // handleGenerate dihapus — submit sekarang dikelola oleh <Form action=...> tanpa onSubmit manual.
 
     const handleBroadcast = (scheduleId) => {
         setConfirmAction({ type: "broadcast", scheduleId });
@@ -182,87 +177,122 @@ export default function Index({ schedules, auth, users }) {
                                 </div>
                             </div>
 
-                            {/* Form generator — struktur bersih, siap untuk migrasi ke <Form> dari @inertiajs/react di sub-task Fase 3 berikutnya.
-                                Saat ini masih pakai useForm + onSubmit manual (tidak ada perubahan breaking). */}
-                            <form
-                                onSubmit={handleGenerate}
+                            {/* Form generator — dimigrasikan ke Inertia v2 <Form> (rekomendasi resmi).
+                                Pakai declarative <Form action={route('schedules.generate')} method="post"> + input dengan name (bukan controlled useForm).
+                                Render children sebagai function untuk akses processing & errors (sesuai pola di CLAUDE.md & Inertia docs).
+                                resetOnSuccess untuk clear otomatis setelah sukses (UX baik untuk form one-shot seperti ini).
+                                Perbaikan visual & a11y Fase 3:
+                                - Label pakai text-white (kontras tinggi di atas gradient).
+                                - Input pakai bg-surface (putih solid) + text gelap agar sangat mudah dibaca (atasi isu "sulit dibaca" di review).
+                                - Gunakan token danger untuk error message (lebih standout dibanding red-300).
+                                - Focus state pakai ring-primary + offset agar visible di gradient.
+                                - Tambah id + htmlFor + aria-describedby + role=alert untuk aksesibilitas screen reader.
+                                - Tombol submit tetap inverted putih (identitas visual gradient tetap), tapi ditambah focus ring yang jelas.
+                                Header gradient + icon + deskripsi tetap utuh (YAGNI, tidak redesign penuh). */}
+                            <Form
+                                action={route("schedules.generate")}
+                                method="post"
+                                resetOnSuccess
                                 className="flex flex-col sm:flex-row gap-4 items-end"
                             >
-                                <div className="w-full sm:w-auto flex-1">
-                                    <label className="block text-sm font-medium text-blue-100 mb-1">
-                                        Tanggal Mulai
-                                    </label>
-                                    <input
-                                        type="date"
-                                        value={data.start_date}
-                                        onChange={(e) =>
-                                            setData(
-                                                "start_date",
-                                                e.target.value,
-                                            )
-                                        }
-                                        className="w-full rounded-lg border-transparent focus:border-white focus:ring-2 focus:ring-white/50 bg-white/10 text-white placeholder-blue-200"
-                                    />
-                                    {errors.start_date && (
-                                        <div className="text-red-300 text-sm mt-1">
-                                            {errors.start_date}
-                                        </div>
-                                    )}
-                                </div>
-                                <div className="w-full sm:w-auto flex-1">
-                                    <label className="block text-sm font-medium text-blue-100 mb-1">
-                                        Tanggal Selesai
-                                    </label>
-                                    <input
-                                        type="date"
-                                        value={data.end_date}
-                                        onChange={(e) =>
-                                            setData("end_date", e.target.value)
-                                        }
-                                        className="w-full rounded-lg border-transparent focus:border-white focus:ring-2 focus:ring-white/50 bg-white/10 text-white placeholder-blue-200"
-                                    />
-                                    {errors.end_date && (
-                                        <div className="text-red-300 text-sm mt-1">
-                                            {errors.end_date}
-                                        </div>
-                                    )}
-                                </div>
-                                <button
-                                    type="submit"
-                                    disabled={processing}
-                                    className="px-6 py-2.5 bg-white text-blue-600 font-bold rounded-lg hover:bg-blue-50 transition-colors shadow-lg disabled:opacity-50 flex items-center gap-2"
-                                >
-                                    {processing ? (
-                                        <>
-                                            <svg
-                                                className="animate-spin h-5 w-5"
-                                                viewBox="0 0 24 24"
+                                {({ processing, errors }) => (
+                                    <>
+                                        <div className="w-full sm:w-auto flex-1">
+                                            <label
+                                                htmlFor="start_date"
+                                                className="block text-sm font-medium text-white mb-1"
                                             >
-                                                <circle
-                                                    className="opacity-25"
-                                                    cx="12"
-                                                    cy="12"
-                                                    r="10"
-                                                    stroke="currentColor"
-                                                    strokeWidth="4"
-                                                    fill="none"
-                                                />
-                                                <path
-                                                    className="opacity-75"
-                                                    fill="currentColor"
-                                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-                                                />
-                                            </svg>
-                                            Memproses...
-                                        </>
-                                    ) : (
-                                        <>
-                                            <span>🚀</span>
-                                            Generate Jadwal
-                                        </>
-                                    )}
-                                </button>
-                            </form>
+                                                Tanggal Mulai
+                                            </label>
+                                            <input
+                                                id="start_date"
+                                                type="date"
+                                                name="start_date"
+                                                className="w-full rounded-lg bg-surface text-gray-900 placeholder:text-gray-400 border border-white/40 focus:border-primary focus:ring-2 focus:ring-primary/60 focus:ring-offset-2 focus:ring-offset-indigo-700 shadow-sm"
+                                                aria-label="Tanggal mulai untuk generate jadwal apel"
+                                                aria-describedby={
+                                                    errors.start_date
+                                                        ? "error-start-date"
+                                                        : undefined
+                                                }
+                                            />
+                                            {errors.start_date && (
+                                                <div
+                                                    id="error-start-date"
+                                                    className="text-danger text-sm mt-1 font-medium"
+                                                    role="alert"
+                                                >
+                                                    {errors.start_date}
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div className="w-full sm:w-auto flex-1">
+                                            <label
+                                                htmlFor="end_date"
+                                                className="block text-sm font-medium text-white mb-1"
+                                            >
+                                                Tanggal Selesai
+                                            </label>
+                                            <input
+                                                id="end_date"
+                                                type="date"
+                                                name="end_date"
+                                                className="w-full rounded-lg bg-surface text-gray-900 placeholder:text-gray-400 border border-white/40 focus:border-primary focus:ring-2 focus:ring-primary/60 focus:ring-offset-2 focus:ring-offset-indigo-700 shadow-sm"
+                                                aria-label="Tanggal selesai untuk generate jadwal apel"
+                                                aria-describedby={
+                                                    errors.end_date
+                                                        ? "error-end-date"
+                                                        : undefined
+                                                }
+                                            />
+                                            {errors.end_date && (
+                                                <div
+                                                    id="error-end-date"
+                                                    className="text-danger text-sm mt-1 font-medium"
+                                                    role="alert"
+                                                >
+                                                    {errors.end_date}
+                                                </div>
+                                            )}
+                                        </div>
+                                        <button
+                                            type="submit"
+                                            disabled={processing}
+                                            className="px-6 py-2.5 bg-white text-blue-600 font-bold rounded-lg hover:bg-blue-50 transition-colors shadow-lg disabled:opacity-50 flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigo-700"
+                                        >
+                                            {processing ? (
+                                                <>
+                                                    <svg
+                                                        className="animate-spin h-5 w-5"
+                                                        viewBox="0 0 24 24"
+                                                    >
+                                                        <circle
+                                                            className="opacity-25"
+                                                            cx="12"
+                                                            cy="12"
+                                                            r="10"
+                                                            stroke="currentColor"
+                                                            strokeWidth="4"
+                                                            fill="none"
+                                                        />
+                                                        <path
+                                                            className="opacity-75"
+                                                            fill="currentColor"
+                                                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                                                        />
+                                                    </svg>
+                                                    Memproses...
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <span>🚀</span>
+                                                    Generate Jadwal
+                                                </>
+                                            )}
+                                        </button>
+                                    </>
+                                )}
+                            </Form>
                         </div>
                     </div>
 
