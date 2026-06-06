@@ -1,59 +1,206 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Sistem Penjadwalan Apel PA Penajam
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Sistem web otomatis untuk penjadwalan petugas Apel di Pengadilan Agama Penajam dengan rotasi adil dan notifikasi WhatsApp grup via Fonnte.
 
-## About Laravel
+[![Laravel](https://img.shields.io/badge/Laravel-12-FF2D20?logo=laravel&logoColor=white)](https://laravel.com)
+[![PHP](https://img.shields.io/badge/PHP-8.2+-777BB4?logo=php&logoColor=white)](https://www.php.net/)
+[![Inertia.js](https://img.shields.io/badge/Inertia.js-2-9553E9)](https://inertiajs.com/)
+[![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=white)](https://reactjs.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Apa itu Sistem Penjadwalan Apel PA Penajam?
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Aplikasi berbasis Laravel + Inertia + React untuk mengelola jadwal Apel (Senin & Jumat) secara otomatis. 
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+Sistem ini menggantikan penugasan manual dengan algoritma rotasi yang mempertimbangkan:
+- Jenis jabatan (Pimpinan, Struktural, Fungsional, Staff)
+- Jenis pegawai (Hakim, PNS, CPNS/CPAPES, PPPK)
+- Gender (L/P)
+- Riwayat penugasan sebelumnya (fair rotation)
 
-## Learning Laravel
+Data pegawai di-import dari file `master.xlsx`. Notifikasi dikirim otomatis atau manual ke **1 grup WhatsApp** (strategi "Jalur Aman" untuk menghindari blokir akun WA).
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+## Fitur Utama
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+- **Generate Jadwal Otomatis**: Pilih rentang tanggal → sistem buat jadwal Senin & Jumat dengan 6 petugas per hari.
+- **Rotasi Otomatis Berdasarkan Aturan**:
+  | Peran              | Kriteria Petugas                          |
+  |--------------------|-------------------------------------------|
+  | Pembina Apel       | Pimpinan (Hakim + Panitera + Sekretaris) |
+  | Pembaca Doa        | Laki-laki PNS + CPAPES                    |
+  | Pembaca 8 Nilai MA | Perempuan PNS Staff                       |
+  | MC                 | Perempuan CPAPES/PPPK Staff               |
+  | Pemimpin Apel      | Laki-laki PPPK                            |
+  | Pembaca Lainnya    | CPAPES Staff                              |
+- Pengecualian otomatis: 1 petugas tidak boleh rangkap peran di jadwal yang sama atau minggu yang sama.
+- **Broadcast WhatsApp Grup via Fonnte**: 1 pesan informatif ke grup (bukan 30 pesan individu).
+- **Import dari master.xlsx**: Seeder `UserSeeder` membaca data NIP, Nama, Jabatan, Unit Kerja, Jenis Pegawai, Jenis Jabatan.
+- **Monitoring Notifikasi**: Status pending/sent/failed, tombol force-send manual, update petugas manual.
+- Test koneksi Fonnte & cek kuota langsung dari aplikasi (`/fonnte/test`, `/fonnte/quota`).
+- Dashboard statistik & upcoming schedules.
+- Autentikasi dengan Laravel Breeze + Sanctum.
 
-## Laravel Sponsors
+## Requirement
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+- PHP ^8.2 (direkomendasikan 8.4+)
+- Composer
+- Node.js >= 18 + npm
+- SQLite (default) atau MySQL/PostgreSQL
+- Akun Fonnte aktif (https://fonnte.com) + device WhatsApp yang terhubung
+- File `master.xlsx` di root proyek (template data pegawai PA Penajam)
 
-### Premium Partners
+## Cara Instalasi & Setup
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+### 1. Persiapan Project
 
-## Contributing
+```bash
+cd /path/to/apel_system/.worktrees/clean-laravel-placeholders
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+composer install
+cp .env.example .env
+php artisan key:generate
+```
 
-## Code of Conduct
+### 2. Database & Seed Data Pegawai
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```bash
+php artisan migrate
 
-## Security Vulnerabilities
+# Pastikan master.xlsx sudah ada di root project
+php artisan db:seed --class=UserSeeder
+# atau
+php artisan db:seed
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Data default user: `password123` (ubah segera di produksi).
 
-## License
+### 3. Setup Fonnte (WhatsApp API)
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+1. Daftar di https://fonnte.com/register
+2. Verifikasi email, login ke https://app.fonnte.com/
+3. **Device** → Tambah Device → Scan QR Code dengan WhatsApp HP Anda (HP harus online terus).
+4. **Settings** → **API** → Copy **API Token**
+5. Edit `.env`:
+
+```env
+FONNTE_TOKEN=paste_token_disini
+FONNTE_TARGET_GROUP=120363xxxxxx@g.us   # ID grup WA (opsional, jika kosong gunakan allgroup)
+```
+
+Lihat detail lengkap di:
+- `docs/QUICKSTART_FONNTE.md`
+- `docs/SETUP_WHATSAPP_API.md`
+
+### 4. Frontend & Run
+
+```bash
+npm install
+npm run build          # produksi
+# atau
+npm run dev            # development (hot reload)
+```
+
+Jalankan aplikasi:
+
+```bash
+php artisan serve
+# atau gunakan script dev lengkap
+composer run dev
+```
+
+Buka: http://localhost:8000
+
+Login dengan user yang di-seed, generate jadwal, lalu broadcast.
+
+### 5. Scheduled Tasks (Otomatis)
+
+Tambahkan ke crontab server produksi:
+
+```bash
+* * * * * cd /path/to/project && php artisan schedule:run >> /dev/null 2>&1
+```
+
+Atau di development, script `composer run dev` sudah menjalankan queue.
+
+## Perintah Penting
+
+```bash
+# Setup awal
+composer install
+php artisan key:generate
+php artisan migrate
+php artisan db:seed --class=UserSeeder
+
+# Generate jadwal (via UI atau bisa lewat controller)
+# Buka /schedules → isi tanggal mulai & selesai → Generate Jadwal
+
+# Kirim notifikasi manual / cek
+php artisan notifications:send-scheduled
+php artisan schedule:send-reminder
+
+# Development
+composer run dev          # server + queue + logs + vite
+npm run dev
+npm run build
+
+# Testing & Quality
+php artisan test --compact
+vendor/bin/pint --dirty   # format code
+php artisan test --filter=...
+
+# Fonnte
+# Buka di browser:
+# /fonnte/test   → test koneksi
+# /fonnte/quota  → cek sisa kuota
+
+# Reset semua jadwal (hati-hati)
+php artisan tinker
+# lalu: \App\Models\Schedule::truncate(); \App\Models\Assignment::truncate();
+```
+
+Lihat juga perintah lengkap:
+
+```bash
+php artisan list | grep -E "(schedule|notification|seed|migrate)"
+```
+
+## Catatan Keamanan & Operasional
+
+- **Strategi Jalur Aman**: Hanya 1 pesan broadcast ke grup WhatsApp per jadwal. Sangat mengurangi risiko akun WA Business diblokir.
+- **Jangan commit** `.env`, `master.xlsx` (jika berisi data sensitif), atau token Fonnte ke Git.
+- Token Fonnte disimpan hanya di `.env`.
+- HP yang dipakai untuk Fonnte device **harus selalu nyala & online**.
+- Kuota Fonnte: Free trial 50 pesan + paket Bronze (Rp150rb/1000 pesan) cukup untuk ~6 bulan (2 broadcast/minggu).
+- Password seed default (`password123`) **harus diganti** sebelum produksi.
+- Gunakan `QUEUE_CONNECTION=database` (sudah default) dan jalankan queue worker di produksi.
+- Backup database sebelum migrasi besar atau reset jadwal.
+- Monitoring: Cek halaman dashboard untuk notifikasi `failed`, lalu gunakan tombol force-send.
+
+Lihat `CHANGELOG_APEL.md` untuk riwayat perubahan aturan & migrasi.
+
+## Struktur Data Pegawai (contoh setelah import)
+
+| Jenis Jabatan | Jumlah | Contoh                  |
+|---------------|--------|-------------------------|
+| Pimpinan      | 6      | Ketua, Wakil, Panitera, Sekretaris |
+| Struktural    | 4      | Panmud, Kasubbag        |
+| Fungsional    | 4      | Panitera Pengganti, Juru Sita |
+| Staff PNS     | 4      | Analis Perkara          |
+| CPAPES        | 5      | Teknisi, Pengelola      |
+| PPPK          | 6      | Penata Layanan, Operator |
+
+## Credit & Lisensi
+
+Dikembangkan untuk kebutuhan operasional **Pengadilan Agama Penajam**.
+
+- Framework: Laravel 12 + Inertia.js v2 + React 18 + Tailwind CSS
+- WhatsApp API: Fonnte
+- Lisensi: [MIT](LICENSE)
+
+Terima kasih kepada semua kontributor dan tim PA Penajam.
+
+---
+
+**Versi saat ini mengikuti** `CHANGELOG_APEL.md` (v2.0.0+).
+
+Untuk bantuan lebih lanjut, lihat dokumentasi di folder `docs/`.
