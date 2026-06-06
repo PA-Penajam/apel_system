@@ -1,38 +1,13 @@
 import { Head, Link } from '@inertiajs/react';
+import { ROLE_ICONS, ROLE_COLORS } from '@/utils/roles';
 
 export default function Welcome({ auth }) {
-    const roles = [
-        {
-            name: "Pembina Apel",
-            icon: "👔",
-            color: "bg-purple-100 border-purple-200 text-purple-800",
-        },
-        {
-            name: "Pembaca Doa",
-            icon: "🤲",
-            color: "bg-green-100 border-green-200 text-green-800",
-        },
-        {
-            name: "Pembaca 8 Nilai MA",
-            icon: "📖",
-            color: "bg-pink-100 border-pink-200 text-pink-800",
-        },
-        {
-            name: "MC",
-            icon: "🎤",
-            color: "bg-yellow-100 border-yellow-200 text-yellow-800",
-        },
-        {
-            name: "Pemimpin Apel",
-            icon: "⭐",
-            color: "bg-blue-100 border-blue-200 text-blue-800",
-        },
-        {
-            name: "Pembaca Lainnya",
-            icon: "📋",
-            color: "bg-gray-100 border-gray-200 text-gray-800",
-        },
-    ];
+    // Generate roles dari utilitas terpusat agar DRY (data icon & color tidak duplikat)
+    const roles = Object.entries(ROLE_ICONS).map(([name, icon]) => ({
+        name,
+        icon,
+        color: ROLE_COLORS[name] || "bg-gray-100 border-gray-200 text-gray-800",
+    }));
 
     const fiturUtama = [
         {

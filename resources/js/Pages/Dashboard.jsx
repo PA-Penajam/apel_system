@@ -2,6 +2,7 @@ import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, Link, router } from "@inertiajs/react";
 import { useState } from "react";
 import Modal from "@/Components/Modal";
+import { getRoleIcon, getRoleColor } from "@/utils/roles";
 
 export default function Dashboard({
     auth,
@@ -55,30 +56,6 @@ export default function Dashboard({
     const handleViewDetail = (schedule) => {
         setSelectedSchedule(schedule);
         setShowDetailModal(true);
-    };
-
-    const getRoleIcon = (role) => {
-        const icons = {
-            "Pembina Apel": "👔",
-            "Pembaca Doa": "🤲",
-            "Pembaca 8 Nilai MA": "📖",
-            MC: "🎤",
-            "Pemimpin Apel": "⭐",
-            "Pembaca Lainnya": "📋",
-        };
-        return icons[role] || "📌";
-    };
-
-    const getRoleColor = (role) => {
-        const colors = {
-            "Pembina Apel": "bg-purple-100 border-purple-200 text-purple-800",
-            "Pembaca Doa": "bg-green-100 border-green-200 text-green-800",
-            "Pembaca 8 Nilai MA": "bg-pink-100 border-pink-200 text-pink-800",
-            MC: "bg-yellow-100 border-yellow-200 text-yellow-800",
-            "Pemimpin Apel": "bg-blue-100 border-blue-200 text-blue-800",
-            "Pembaca Lainnya": "bg-gray-100 border-gray-200 text-gray-800",
-        };
-        return colors[role] || "bg-gray-100 border-gray-200 text-gray-800";
     };
 
     return (
