@@ -3,6 +3,7 @@ import { Head, useForm, router } from "@inertiajs/react";
 import { useState } from "react";
 import ScheduleEditModal from "@/Components/ScheduleEditModal";
 import ConfirmDialog from "@/Components/ConfirmDialog";
+import PrimaryButton from "@/Components/PrimaryButton";
 import { getRoleIcon, getRoleColor } from "@/utils/roles";
 
 export default function Index({ schedules, auth, users }) {
@@ -181,6 +182,8 @@ export default function Index({ schedules, auth, users }) {
                                 </div>
                             </div>
 
+                            {/* Form generator — struktur bersih, siap untuk migrasi ke <Form> dari @inertiajs/react di sub-task Fase 3 berikutnya.
+                                Saat ini masih pakai useForm + onSubmit manual (tidak ada perubahan breaking). */}
                             <form
                                 onSubmit={handleGenerate}
                                 className="flex flex-col sm:flex-row gap-4 items-end"
@@ -429,7 +432,7 @@ export default function Index({ schedules, auth, users }) {
                                                                 broadcastingId ===
                                                                 schedule.id
                                                             }
-                                                            className="flex-1 py-2 px-3 rounded-lg text-sm font-medium bg-white text-indigo-600 hover:bg-indigo-50 border border-gray-200 transition-all flex items-center justify-center gap-2"
+                                                            className="flex-1 py-2 px-3 rounded-lg text-sm font-medium bg-white text-primary hover:bg-primary/10 border border-gray-200 transition-all flex items-center justify-center gap-2"
                                                             title="Kirim notifikasi individual ke petugas"
                                                         >
                                                             <svg
@@ -452,14 +455,14 @@ export default function Index({ schedules, auth, users }) {
                                                         </button>
                                                     )}
 
-                                                    {/* Edit Petugas Button */}
+                                                    {/* Edit Petugas Button - distandarisasi ke primary token */}
                                                     <button
                                                         onClick={() =>
                                                             handleOpenEditModal(
                                                                 schedule,
                                                             )
                                                         }
-                                                        className="p-2 rounded-lg text-sm font-medium bg-indigo-600 text-white hover:bg-indigo-700 transition-all flex items-center justify-center"
+                                                        className="p-2 rounded-lg text-sm font-medium bg-primary text-white hover:bg-primary/90 transition-all flex items-center justify-center"
                                                         title="Edit petugas"
                                                     >
                                                         <svg
@@ -569,10 +572,11 @@ export default function Index({ schedules, auth, users }) {
                         </h4>
 
                         <div className="flex flex-wrap gap-4 mb-4">
-                            <button
+                            {/* Tombol Fonnte distandarisasi pakai PrimaryButton + token primary/success */}
+                            <PrimaryButton
+                                variant="primary"
                                 onClick={handleTestConnection}
                                 disabled={checkingFonnte}
-                                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 flex items-center gap-2"
                             >
                                 {checkingFonnte ? (
                                     <svg
@@ -598,12 +602,12 @@ export default function Index({ schedules, auth, users }) {
                                     <span>🔗</span>
                                 )}
                                 Test Koneksi
-                            </button>
+                            </PrimaryButton>
 
-                            <button
+                            <PrimaryButton
+                                variant="success"
                                 onClick={handleCheckQuota}
                                 disabled={checkingFonnte}
-                                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 flex items-center gap-2"
                             >
                                 {checkingFonnte ? (
                                     <svg
@@ -629,7 +633,7 @@ export default function Index({ schedules, auth, users }) {
                                     <span>📊</span>
                                 )}
                                 Cek Kuota
-                            </button>
+                            </PrimaryButton>
                         </div>
 
                         {/* Test Connection Result */}

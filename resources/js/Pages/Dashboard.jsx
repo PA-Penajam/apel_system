@@ -3,6 +3,7 @@ import { Head, Link, router } from "@inertiajs/react";
 import { useState } from "react";
 import Modal from "@/Components/Modal";
 import ConfirmDialog from "@/Components/ConfirmDialog";
+import PrimaryButton from "@/Components/PrimaryButton";
 import { getRoleIcon, getRoleColor } from "@/utils/roles";
 
 export default function Dashboard({
@@ -83,7 +84,7 @@ export default function Dashboard({
 
             <div className="py-12 bg-gray-50 min-h-screen">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8 space-y-6">
-                    {/* Welcome Section */}
+                    {/* Welcome Section - banner menggunakan gradient brand (blue-indigo) yang akan distandarisasi lebih lanjut via primary token di Fase 3 lanjutan */}
                     <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                         <div className="p-6 bg-gradient-to-r from-blue-600 to-indigo-700 text-white">
                             <h3 className="text-2xl font-bold mb-2">
@@ -246,7 +247,9 @@ export default function Dashboard({
                                                     </p>
                                                 </div>
                                             </div>
-                                            <button
+                                            {/* Tombol menggunakan variant danger dari PrimaryButton (token --danger) */}
+                                            <PrimaryButton
+                                                variant="danger"
                                                 onClick={() =>
                                                     handleRetryNotification(
                                                         schedule.id,
@@ -256,7 +259,7 @@ export default function Dashboard({
                                                     broadcastingId ===
                                                     schedule.id
                                                 }
-                                                className="px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 disabled:opacity-50 flex items-center gap-2 transition-colors"
+                                                className="flex items-center gap-2 text-sm"
                                             >
                                                 {broadcastingId ===
                                                 schedule.id ? (
@@ -288,7 +291,7 @@ export default function Dashboard({
                                                         Coba Lagi
                                                     </>
                                                 )}
-                                            </button>
+                                            </PrimaryButton>
                                         </div>
                                     ))}
                                 </div>
@@ -303,18 +306,19 @@ export default function Dashboard({
                                 ⚡ Aksi Cepat
                             </h3>
                             <div className="flex flex-wrap gap-4">
+                                {/* Contoh penggunaan token semantic: bg-primary (menggantikan blue-600) */}
                                 <Link
                                     href={route("schedules.index")}
-                                    className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                                    className="inline-flex items-center px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
                                 >
                                     <span className="mr-2">📅</span>
                                     Kelola Jadwal Apel
                                 </Link>
                                 {stats.total_schedules > 0 && (
-                                    <button
+                                    <PrimaryButton
+                                        variant="danger"
                                         onClick={handleResetSchedules}
                                         disabled={resetting}
-                                        className="inline-flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50"
                                     >
                                         {resetting ? (
                                             <>
@@ -345,7 +349,7 @@ export default function Dashboard({
                                                 Reset Jadwal
                                             </>
                                         )}
-                                    </button>
+                                    </PrimaryButton>
                                 )}
                             </div>
                         </div>
@@ -606,9 +610,10 @@ export default function Dashboard({
 
                             {/* Actions */}
                             <div className="mt-6 flex justify-end gap-3">
+                                {/* Demonstrasi token primary pada Link di dalam modal */}
                                 <Link
                                     href={route("schedules.index")}
-                                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                                    className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
                                 >
                                     Kelola Jadwal
                                 </Link>
