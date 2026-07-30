@@ -2,18 +2,16 @@
 
 namespace Database\Factories;
 
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\User>
+ * @extends Factory<User>
  */
 class UserFactory extends Factory
 {
-    /**
-     * The current password being used by the factory.
-     */
     protected static ?string $password;
 
     /**
@@ -29,16 +27,49 @@ class UserFactory extends Factory
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
+            'nip' => fake()->optional()->numerify('##################'),
+            'phone' => fake()->optional()->numerify('08##########'),
+            'jabatan' => fake()->optional()->jobTitle(),
+            'jenis_pegawai' => fake()->randomElement(['PNS', 'CPNS', 'PPPK', 'Hakim', 'Honorer']),
+            'jenis_jabatan' => fake()->randomElement(['pimpinan', 'Struktural', 'Fungsional', 'Staff']),
+            'gender' => fake()->randomElement(['L', 'P']),
+            'role' => 'pegawai',
+            'is_active' => true,
         ];
     }
 
-    /**
-     * Indicate that the model's email address should be unverified.
-     */
     public function unverified(): static
     {
         return $this->state(fn (array $attributes) => [
             'email_verified_at' => null,
+        ]);
+    }
+
+    public function inactive(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'is_active' => false,
+        ]);
+    }
+
+    public function male(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'gender' => 'L',
+        ]);
+    }
+
+    public function female(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'gender' => 'P',
+        ]);
+    }
+
+    public function jenisJabatan(string $jenisJabatan): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'jenis_jabatan' => $jenisJabatan,
         ]);
     }
 }

@@ -37,6 +37,12 @@ export default function AuthenticatedLayout({ header, children }) {
                                 >
                                     Jadwal Apel
                                 </NavLink>
+                                <NavLink
+                                    href={route('users.index')}
+                                    active={route().current('users.*')}
+                                >
+                                    Pegawai
+                                </NavLink>
                             </div>
                         </div>
 
@@ -146,6 +152,12 @@ export default function AuthenticatedLayout({ header, children }) {
                             active={route().current('schedules.*')}
                         >
                             Jadwal Apel
+                        </ResponsiveNavLink>
+                        <ResponsiveNavLink
+                            href={route('users.index')}
+                            active={route().current('users.*')}
+                        >
+                            Pegawai
                         </ResponsiveNavLink>
                     </div>
 

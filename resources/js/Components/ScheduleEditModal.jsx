@@ -1,7 +1,11 @@
 import Modal from "@/Components/Modal";
 import { useForm, router } from "@inertiajs/react";
 import { useEffect } from "react";
-import { getRoleIcon, getRoleColor, getRoleCriteria } from "@/utils/roles";
+import {
+    getRoleIcon,
+    getRoleColor,
+    getEligibleUsersForRole,
+} from "@/utils/roles";
 
 export default function ScheduleEditModal({ show, onClose, schedule, users }) {
     const { data, setData, put, processing, errors, reset } = useForm({

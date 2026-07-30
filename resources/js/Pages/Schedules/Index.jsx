@@ -1,35 +1,35 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, router } from "@inertiajs/react";
-import { useState } from "react";
+import { useState, useMemo, useEffect } from "react";
 import ScheduleEditModal from "@/Components/ScheduleEditModal";
 import ConfirmDialog from "@/Components/ConfirmDialog";
 
-// Partial components hasil split Task 11 (refactor monolitik Schedules/Index.jsx).
-// Setiap partial fokus pada satu tanggung jawab, max ~150-200 baris, perilaku & visual identik.
 import GeneratorSection from "./partials/GeneratorSection";
-import ScheduleCard from "./partials/ScheduleCard";
+import ScheduleTable from "./partials/ScheduleTable";
 import FonntePanel from "./partials/FonntePanel";
 import Legend from "./partials/Legend";
+import AbsenceModal from "./partials/AbsenceModal";
 
 export default function Index({ schedules, auth, users }) {
-    // Index.jsx sekarang adalah thin coordinator setelah split (Task 11).
-    // Hanya mengelola:
-    // - State high-level yang dibagikan antar partial/list (broadcastingId untuk aksi kirim, editing + modal, confirmAction untuk ConfirmDialog global).
-    // - Handler untuk broadcast/manual/edit yang memicu confirm atau modal (state update + router call).
-    // - Grouping schedules per bulan + render list via ScheduleCard.
-    // - Compose 4 partials.
-    //
-    // State & handler Fonnte dipindah sepenuhnya ke FonntePanel (enkapsulasi).
-    // Generator form sepenuhnya di GeneratorSection (pakai <Form> Inertia).
-    // getStatusBadge dan role rendering ada di ScheduleCard.
-    //
-    // Semua perilaku, data flow, loading, confirm, modal tetap sama 100%.
     const [broadcastingId, setBroadcastingId] = useState(null);
     const [editingSchedule, setEditingSchedule] = useState(null);
     const [showEditModal, setShowEditModal] = useState(false);
+    const [absenceAssignment, setAbsenceAssignment] = useState(null);
+    const [showAbsenceModal, setShowAbsenceModal] = useState(false);
     const [confirmAction, setConfirmAction] = useState(null);
 
-    // handleGenerate dihapus sejak migrasi <Form> (Fase sebelumnya).
+    // UX Filters & Search states (default to "all" so newly generated schedules are immediately visible)
+    const monthKeys = useMemo(() => Object.keys(schedules), [schedules]);
+    const [selectedMonth, setSelectedMonth] = useState("all");
+    const [searchQuery, setSearchQuery] = useState("");
+    const [typeFilter, setTypeFilter] = useState("all");
+
+    // Automatically ensure selectedMonth remains valid if schedules change
+    useEffect(() => {
+        if (selectedMonth !== "all" && !monthKeys.includes(selectedMonth)) {
+            setSelectedMonth("all");
+        }
+    }, [monthKeys, selectedMonth]);
 
     const handleBroadcast = (scheduleId) => {
         setConfirmAction({ type: "broadcast", scheduleId });
@@ -48,12 +48,8 @@ export default function Index({ schedules, auth, users }) {
                 setBroadcastingId(scheduleId);
                 router.post(
                     route("schedules.broadcast"),
-                    {
-                        schedule_id: scheduleId,
-                    },
-                    {
-                        onFinish: () => setBroadcastingId(null),
-                    },
+                    { schedule_id: scheduleId },
+                    { onFinish: () => setBroadcastingId(null) }
                 );
                 break;
             }
@@ -62,17 +58,12 @@ export default function Index({ schedules, auth, users }) {
                 setBroadcastingId(scheduleId);
                 router.post(
                     route("schedules.broadcast.all"),
-                    {
-                        schedule_id: scheduleId,
-                    },
-                    {
-                        onFinish: () => setBroadcastingId(null),
-                    },
+                    { schedule_id: scheduleId },
+                    { onFinish: () => setBroadcastingId(null) }
                 );
                 break;
             }
         }
-
         setConfirmAction(null);
     };
 
@@ -81,9 +72,48 @@ export default function Index({ schedules, auth, users }) {
         setShowEditModal(true);
     };
 
-    // handleTestConnection & handleCheckQuota + 3 state Fonnte sudah sepenuhnya dipindahkan
-    // ke FonntePanel.jsx (enkapsulasi, tidak ada reference lagi di coordinator).
-    // getStatusBadge juga sudah di ScheduleCard.
+    const handleOpenAbsenceModal = (assignment) => {
+        setAbsenceAssignment(assignment);
+        setShowAbsenceModal(true);
+    };
+
+    // Filter schedules according to selected month, search query, and type
+    const filteredSchedulesByMonth = useMemo(() => {
+        const result = {};
+
+        const monthsToProcess =
+            selectedMonth === "all" ? monthKeys : [selectedMonth];
+
+        monthsToProcess.forEach((month) => {
+            const list = schedules[month] || [];
+            const filteredList = list.filter((item) => {
+                // Type filter
+                if (typeFilter !== "all" && item.type !== typeFilter) {
+                    return false;
+                }
+
+                // Search query filter (matches date or officer name)
+                if (searchQuery.trim()) {
+                    const q = searchQuery.toLowerCase();
+                    const matchesDate = item.date.toLowerCase().includes(q);
+                    const matchesOfficer = item.assignments.some(
+                        (a) =>
+                            a.user &&
+                            a.user.name.toLowerCase().includes(q)
+                    );
+                    return matchesDate || matchesOfficer;
+                }
+
+                return true;
+            });
+
+            if (filteredList.length > 0) {
+                result[month] = filteredList;
+            }
+        });
+
+        return result;
+    }, [schedules, selectedMonth, searchQuery, typeFilter, monthKeys]);
 
     return (
         <AuthenticatedLayout
@@ -96,74 +126,127 @@ export default function Index({ schedules, auth, users }) {
         >
             <Head title="Jadwal Apel - PA Penajam" />
 
-            <div className="py-12 bg-gray-50 min-h-screen">
-                <div className="mx-auto max-w-7xl sm:px-6 lg:px-8 space-y-8">
-                    {/* Generator Section — sekarang sepenuhnya di partial (ekstraksi Task 11).
-                        Index hanya compose; tidak ada lagi JSX generator di file ini. */}
+            <div className="py-8 bg-gray-50 min-h-screen">
+                <div className="mx-auto max-w-7xl sm:px-6 lg:px-8 space-y-6">
+                    {/* Generator Section */}
                     <GeneratorSection />
 
-                    {/* Schedules List (koordinasi grouping per bulan tetap di Index sebagai "list coordinator").
-                        Setiap kartu individual dirender via ScheduleCard (dengan callback wiring). */}
-                    {Object.keys(schedules).length === 0 ? (
-                        <div className="text-center py-20 bg-white rounded-2xl shadow-sm border border-dashed border-gray-300">
-                            <div className="text-6xl mb-4">📭</div>
-                            <p className="text-gray-500 text-lg mb-2">
-                                Belum ada jadwal yang dibuat
+                    {/* Filter & Search Bar */}
+                    {monthKeys.length > 0 && (
+                        <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-200 space-y-4">
+                            {/* Month Tabs */}
+                            <div className="flex flex-wrap items-center gap-2 pb-2 border-b border-gray-100">
+                                <span className="text-xs font-bold text-gray-500 uppercase mr-2">
+                                    Pilih Bulan:
+                                </span>
+                                <button
+                                    onClick={() => setSelectedMonth("all")}
+                                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                                        selectedMonth === "all"
+                                            ? "bg-indigo-600 text-white shadow-sm"
+                                            : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                                    }`}
+                                >
+                                    Semua Bulan
+                                </button>
+                                {monthKeys.map((month) => (
+                                    <button
+                                        key={month}
+                                        onClick={() => setSelectedMonth(month)}
+                                        className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                                            selectedMonth === month
+                                                ? "bg-indigo-600 text-white shadow-sm"
+                                                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                                        }`}
+                                    >
+                                        {month} ({schedules[month].length})
+                                    </button>
+                                ))}
+                            </div>
+
+                            {/* Search & Type Filter */}
+                            <div className="flex flex-col sm:flex-row gap-3 justify-between items-center">
+                                <div className="w-full sm:w-80 relative">
+                                    <input
+                                        type="text"
+                                        placeholder="🔍 Cari petugas atau tanggal..."
+                                        value={searchQuery}
+                                        onChange={(e) =>
+                                            setSearchQuery(e.target.value)
+                                        }
+                                        className="w-full pl-3 pr-8 py-1.5 text-xs rounded-lg border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500"
+                                    />
+                                    {searchQuery && (
+                                        <button
+                                            onClick={() => setSearchQuery("")}
+                                            className="absolute right-2.5 top-2 text-xs text-gray-400 hover:text-gray-600"
+                                        >
+                                            ✕
+                                        </button>
+                                    )}
+                                </div>
+
+                                <div className="flex items-center gap-2 w-full sm:w-auto">
+                                    <span className="text-xs text-gray-500 font-medium">
+                                        Jenis:
+                                    </span>
+                                    <select
+                                        value={typeFilter}
+                                        onChange={(e) =>
+                                            setTypeFilter(e.target.value)
+                                        }
+                                        className="text-xs rounded-lg border-gray-300 py-1.5 focus:ring-indigo-500"
+                                    >
+                                        <option value="all">Semua Tipe</option>
+                                        <option value="senin">Apel Senin</option>
+                                        <option value="jumat">Apel Jumat</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Schedules List */}
+                    {Object.keys(filteredSchedulesByMonth).length === 0 ? (
+                        <div className="text-center py-16 bg-white rounded-xl shadow-sm border border-dashed border-gray-300">
+                            <div className="text-5xl mb-3">📭</div>
+                            <p className="text-gray-600 font-medium text-base mb-1">
+                                Tidak ada jadwal ditemukan
                             </p>
-                            <p className="text-gray-400 text-sm">
-                                Gunakan form di atas untuk generate jadwal apel
+                            <p className="text-gray-400 text-xs">
+                                Coba ubah kata kunci pencarian atau tab bulan di atas
                             </p>
                         </div>
                     ) : (
-                        Object.keys(schedules).map((month) => (
-                            <div key={month} className="space-y-4">
-                                {/* Month Header */}
-                                <div className="flex items-center gap-4">
-                                    <h3 className="text-xl font-bold text-gray-700 flex items-center gap-2">
+                        Object.keys(filteredSchedulesByMonth).map((month) => (
+                            <div key={month} className="space-y-3">
+                                <div className="flex items-center gap-3">
+                                    <h3 className="text-lg font-bold text-gray-800 flex items-center gap-2">
                                         <span>📆</span>
                                         {month}
                                     </h3>
                                     <div className="h-px flex-1 bg-gray-200"></div>
-                                    <span className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
-                                        {schedules[month].length} jadwal
+                                    <span className="text-xs text-gray-500 bg-white px-2.5 py-1 rounded-md border border-gray-200 shadow-sm font-semibold">
+                                        {filteredSchedulesByMonth[month].length} jadwal
                                     </span>
                                 </div>
 
-                                {/* Schedule Cards — diganti dari inline div besar menjadi ScheduleCard.
-                                    Wiring: isBroadcasting + callback yang close-over id/schedule agar parent state terupdate. */}
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                    {schedules[month].map((schedule) => (
-                                        <ScheduleCard
-                                            key={schedule.id}
-                                            schedule={schedule}
-                                            isBroadcasting={
-                                                broadcastingId === schedule.id
-                                            }
-                                            onBroadcast={() =>
-                                                handleBroadcast(schedule.id)
-                                            }
-                                            onManualSend={() =>
-                                                handleManualSend(schedule.id)
-                                            }
-                                            onEdit={() =>
-                                                handleOpenEditModal(schedule)
-                                            }
-                                        />
-                                    ))}
-                                </div>
+                                <ScheduleTable
+                                    schedules={filteredSchedulesByMonth[month]}
+                                    isBroadcastingId={broadcastingId}
+                                    onBroadcast={handleBroadcast}
+                                    onManualSend={handleManualSend}
+                                    onEdit={handleOpenEditModal}
+                                    onAbsence={handleOpenAbsenceModal}
+                                />
                             </div>
                         ))
                     )}
 
-                    {/* Legend — diekstrak ke partial (meski kecil, untuk konsistensi struktur). */}
                     <Legend />
-
-                    {/* Fonnte Status Section — sepenuhnya dipindah ke FonntePanel (state + handler + JSX).
-                        Index hanya me-render komponen; tidak ada lagi state fonnte atau PrimaryButton di file ini. */}
                     <FonntePanel />
                 </div>
 
-                {/* Edit Modal */}
                 <ScheduleEditModal
                     show={showEditModal}
                     onClose={() => setShowEditModal(false)}
@@ -171,7 +254,13 @@ export default function Index({ schedules, auth, users }) {
                     users={users}
                 />
 
-                {/* Confirm Dialog untuk mengganti window.confirm */}
+                <AbsenceModal
+                    show={showAbsenceModal}
+                    onClose={() => setShowAbsenceModal(false)}
+                    assignment={absenceAssignment}
+                    users={users}
+                />
+
                 <ConfirmDialog
                     show={!!confirmAction}
                     onClose={() => setConfirmAction(null)}

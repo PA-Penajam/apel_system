@@ -1,19 +1,17 @@
 {
     "agents": [
-        "claude_code",
-        "codex",
         "copilot",
-        "cursor",
-        "gemini",
-        "opencode"
-    ],
-    "editors": [
-        "claude_code",
-        "codex",
-        "cursor",
-        "gemini",
         "opencode",
-        "vscode"
+        "antigravity"
     ],
-    "guidelines": []
+    "cloud": false,
+    "guidelines": true,
+    "mcp": true,
+    "nightwatch": false,
+    "sail": false,
+    "skills": [
+        "laravel-best-practices",
+        "inertia-react-development",
+        "tailwindcss-development"
+    ]
 }

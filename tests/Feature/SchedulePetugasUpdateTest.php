@@ -92,4 +92,45 @@ class SchedulePetugasUpdateTest extends TestCase
 
         $response->assertSessionHasErrors('assignments.0.id');
     }
+
+    public function test_edit_manual_does_not_create_deferred_assignment(): void
+    {
+        $admin = User::factory()->create();
+        $userA = User::factory()->create(['name' => 'User A']);
+        $userB = User::factory()->create(['name' => 'User B']);
+
+        $schedule = Schedule::create([
+            'date' => '2026-08-03',
+            'type' => 'senin',
+            'notification_status' => 'pending',
+        ]);
+
+        $assignment = Assignment::create([
+            'schedule_id' => $schedule->id,
+            'user_id' => $userA->id,
+            'role' => 'Pembaca Doa',
+        ]);
+
+        $this
+            ->actingAs($admin)
+            ->put(route('schedules.petugas.update', $schedule), [
+                'assignments' => [
+                    [
+                        'id' => $assignment->id,
+                        'role' => 'Pembaca Doa',
+                        'user_id' => $userB->id,
+                    ],
+                ],
+            ]);
+
+        $this->assertDatabaseHas('assignments', [
+            'id' => $assignment->id,
+            'user_id' => $userB->id,
+        ]);
+
+        $this->assertDatabaseMissing('deferred_assignments', [
+            'user_id' => $userA->id,
+            'role' => 'Pembaca Doa',
+        ]);
+    }
 }

@@ -19,8 +19,9 @@ class UserSeeder extends Seeder
     {
         $filePath = base_path('master.xlsx');
 
-        if (!file_exists($filePath)) {
+        if (! file_exists($filePath)) {
             $this->command->error('master.xlsx tidak ditemukan!');
+
             return;
         }
 
@@ -32,8 +33,9 @@ class UserSeeder extends Seeder
         $headerSkipped = false;
 
         foreach ($rows as $index => $row) {
-            if (!$headerSkipped) {
+            if (! $headerSkipped) {
                 $headerSkipped = true;
+
                 continue;
             }
 
@@ -57,7 +59,7 @@ class UserSeeder extends Seeder
             $gender = $this->determineGender($name);
 
             // Create email from NIP (if available)
-            $email = !empty($nip) ? $nip . '@pa-penajam.go.id' : null;
+            $email = ! empty($nip) ? $nip.'@pa-penajam.go.id' : null;
 
             // Default password for all users
             $password = Hash::make('password123');
@@ -91,8 +93,8 @@ class UserSeeder extends Seeder
     {
         // Female markers
         $femaleMarkers = ['PUTRI', 'NURUL', 'FITRIANI', 'KHOFIFAH', 'NASUHA', 'YUSTISIA',
-                          'FARIDAH', 'YULIANA', 'MAULIDINA', 'PRAMESTI', 'HIJRIANA',
-                          'NOVAYANTI', 'NUR AINI', 'NUR MUFLIHAH'];
+            'FARIDAH', 'YULIANA', 'MAULIDINA', 'PRAMESTI', 'HIJRIANA',
+            'NOVAYANTI', 'NUR AINI', 'NUR MUFLIHAH'];
 
         // Check for female markers
         $nameUpper = strtoupper($name);

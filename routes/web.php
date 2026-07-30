@@ -1,11 +1,12 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ScheduleAbsenceController;
 use App\Http\Controllers\ScheduleController;
+use App\Http\Controllers\UserController;
 use App\Models\Assignment;
 use App\Models\Schedule;
 use Carbon\Carbon;
-use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -139,6 +140,16 @@ Route::middleware('auth')->group(function () {
     Route::delete('/schedules/{schedule}', [ScheduleController::class, 'destroy'])->name('schedules.destroy');
     Route::post('/schedules/force-send', [ScheduleController::class, 'forceSendManual'])->name('schedules.force-send');
     Route::put('/schedules/{schedule}/petugas', [ScheduleController::class, 'updatePetugas'])->name('schedules.petugas.update');
+
+    // Absence / Berhalangan routes
+    Route::get('/assignments/{assignment}/absent/preview', [ScheduleAbsenceController::class, 'preview'])->name('assignments.absent.preview');
+    Route::post('/assignments/{assignment}/absent', [ScheduleAbsenceController::class, 'store'])->name('assignments.absent.store');
+
+    // User / Pegawai routes
+    Route::get('/users', [UserController::class, 'index'])->name('users.index');
+    Route::post('/users', [UserController::class, 'store'])->name('users.store');
+    Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');
+    Route::patch('/users/{user}/toggle-status', [UserController::class, 'toggleStatus'])->name('users.toggle-status');
 
     // Fonnte broadcast routes
     Route::post('/schedules/broadcast', [ScheduleController::class, 'broadcast'])->name('schedules.broadcast');
