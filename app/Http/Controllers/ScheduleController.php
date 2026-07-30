@@ -47,8 +47,10 @@ class ScheduleController extends Controller
     public function generate(Request $request, SchedulerService $scheduler)
     {
         $request->validate([
-            'start_date' => 'required|date',
+            'start_date' => 'required|date|after_or_equal:today',
             'end_date' => 'required|date|after_or_equal:start_date',
+        ], [
+            'start_date.after_or_equal' => 'Tanggal mulai tidak boleh di masa lalu.',
         ]);
 
         $scheduler->generate(
@@ -371,11 +373,16 @@ class ScheduleController extends Controller
         foreach ($validated['assignments'] as $assignmentData) {
             $assignment = Assignment::find($assignmentData['id']);
             if ($assignment && $assignment->schedule_id === $schedule->id) {
-                $assignment->update([
-                    'user_id' => $assignmentData['user_id'],
-                    'role' => $assignmentData['role'],
-                ]);
-                \Log::info('Assignment updated', ['assignment_id' => $assignment->id, 'user_id' => $assignmentData['user_id']]);
+                $oldUserId = $assignment->user_id;
+                $newUserId = $assignmentData['user_id'];
+
+                if ($oldUserId != $newUserId) {
+                    $assignment->update([
+                        'user_id' => $newUserId,
+                        'role' => $assignmentData['role'],
+                    ]);
+                    \Log::info('Assignment updated', ['assignment_id' => $assignment->id, 'old_user' => $oldUserId, 'new_user' => $newUserId]);
+                }
             }
         }
 
